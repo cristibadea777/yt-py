@@ -1,5 +1,27 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 
+
+
+
+
+
+#IDEI VIITOR
+#scraping mai bun, sa ia toate rezultatele nu doar 10 cate ia acum - sau un nr de rezultate, 50
+#functie de cut al clipului - sa fac cumva sa il decarc in tempfile apoi sa fie cut
+#functie de descarcare playlisturi - trebuie sa fac GUI-ul mai frumos intai 
+#lucrat la layout-uri. sa vina elementele mai bine. asta in alt program, sa semene cu mediahuman 
+#https://github.com/kokoko3k/xt7-player-mpv -- imi place cum arata si asta
+#facut programu executabil .exe
+#functionalitate mai avansata de download - selectare calitate/format/etc 
+
+
+
+
+
+
+
+
+
 import mpv
 import requests
 from bs4 import BeautifulSoup
@@ -14,8 +36,6 @@ import subprocess
 from PyQt5.QtGui import QIcon, QPixmap
 from urllib.request import urlopen
 import base64
-from PIL import Image
-from PIL import Image, ImageTk
 import tempfile
 import os
 from yt_dlp import YoutubeDL
@@ -76,6 +96,7 @@ class Ui_MainWindow(object):
         font.setPointSize(12)
         font.setBold(True)
         font.setWeight(75)
+        
         self.pushButtonDescarca.setFont(font)
         self.pushButtonDescarca.setObjectName("pushButtonDescarca")
         MainWindow.setCentralWidget(self.centralwidget)
@@ -141,7 +162,6 @@ class Ui_MainWindow(object):
         #Informatiile din videoRenderer sunt inauntrul unui String JSON 
         #Avem nevoie sa gasim tag-ul HTML in care se afla variabila asta. 
         #Se afla inauntrul al 35-lea tag <script> 
-        #https://www.youtube.com/watch?v=UBDY5mjtuNE
         #au mai modificat intre timp pentru ca in trecut era 33)
         script = soup.find_all("script")[34]
         #print(script)
@@ -199,24 +219,41 @@ class Ui_MainWindow(object):
         self.labelActiune.setText("Actiune: Adaugare clipuri...")
         self.labelActiune.repaint()
         top_widget = QtWidgets.QWidget()
-        top_layout = QtWidgets.QVBoxLayout()
+        top_vertical_layout = QtWidgets.QVBoxLayout()
         titlu = ""
 
         #Facem PARSE la data
         #accesam lista content 
         for data in content:
             for key, value in data.items():
-              
+                #group box, adaugat la vertical layout
                 group_box = QtWidgets.QGroupBox()
-                #group_box.setCheckable(True)
-                top_layout.addWidget(group_box)
+                group_box.setCheckable(True)
+                group_box.setGeometry(QtCore.QRect(10, 20, 521, 141))
+                top_vertical_layout.addWidget(group_box)
+                #label imagine
+                label_image = QtWidgets.QLabel()
+                #buton play
+                push_button = QtWidgets.QPushButton()
+                push_button.setFixedSize(50, 50)
+                push_button.setText("▶︎")
+                font = QtGui.QFont()
+                font.setPointSize(20)
+                push_button.setFont(font)
+                #horizontal layout al group box
                 groupbox_horizontal_layout = QtWidgets.QHBoxLayout()
+                groupbox_horizontal_layout.addWidget(label_image)
+                groupbox_horizontal_layout.addWidget(push_button)
+                #Elementele nu vor avea spatii mari intre ele cu urmatoarele doua linii
+                groupbox_horizontal_layout.setSpacing(10) 
+                groupbox_horizontal_layout.addStretch(1) 
+                #vertical layout
                 group_box.setLayout(groupbox_horizontal_layout)
+                top_vertical_layout.addLayout(groupbox_horizontal_layout) 
 
                 for k, v in value.items():
                     #print(f"{k} : {v}") - cheie si valoare ex: videoID : id-ul videoului
                     #extragere videoID, thumbnail la fiecare iteratie se adauga un clip nou
-                    
                     if k == "title" and "runs" in v or k == "thumbnail" and "thumbnails" in v or k == "longBylineText" and "runs" in v or k == "videoId" and len(v) == 11: 
                         ####################################                            
                         #Titlul clipului si autorul 
@@ -229,23 +266,13 @@ class Ui_MainWindow(object):
                         #"thumbnail" - "thumbnails"[0] (primul) - "url"
                         if k == "thumbnail" and "thumbnails" in v:
                             smaller_pixmap = self.rezolvarePoza(v["thumbnails"][0]["url"])
-                            label_image = QLabel()
                             label_image.setPixmap(smaller_pixmap)
-                            groupbox_horizontal_layout.addWidget(label_image) 
                         ####################################
                         #butonul play va avea Id-ul videoId. cand dam click, se va lua Id-ul
                         if k == "videoId" and len(v) == 11:
-                            push_button = QtWidgets.QPushButton()
-                            push_button.setFixedSize(50, 50)
-                            push_button.setText("▶︎")
-                            font = QtGui.QFont()
-                            font.setPointSize(20)
-                            push_button.setFont(font)
                             push_button.clicked.connect(lambda checked, index=v: self.playVideo(index))
-                            groupbox_horizontal_layout.addWidget(push_button) 
-
         ####################################
-        top_widget.setLayout(top_layout)
+        top_widget.setLayout(top_vertical_layout)
         self.scrollAreaClipuri.setWidget(top_widget) 
         self.labelActiune.setText("Actiune:")
         self.labelActiune.repaint()
