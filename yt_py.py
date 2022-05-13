@@ -262,15 +262,17 @@ class Ui_MainWindow(object):
                         if k == "longBylineText" and "runs" in v:
                             group_box.setTitle(v["runs"][0]["text"] + " - " + titlu)
                         ####################################
-                        #accesam element cu element in jos. ne intereseaza "url"
-                        #"thumbnail" - "thumbnails"[0] (primul) - "url"
-                        if k == "thumbnail" and "thumbnails" in v:
-                            smaller_pixmap = self.rezolvarePoza(v["thumbnails"][0]["url"])
-                            label_image.setPixmap(smaller_pixmap)
-                        ####################################
                         #butonul play va avea Id-ul videoId. cand dam click, se va lua Id-ul
                         if k == "videoId" and len(v) == 11:
                             push_button.clicked.connect(lambda checked, index=v: self.playVideo(index))
+                            #URL-ul thumbnail-ului, care e compus din ID-ul clipului
+                            #Nu mai fac scrape la URL direct pentru ca thumbnailurile #shorts nu merg
+                            #2.jpg, 1.jpg la shorts nu merg, dar 0.jpg merge. 
+                            #scrape-ul ia mereu 2.jpg, nu ma complic si o sa lucrez doar cu video ID 
+                            #https://i.ytimg.com/vi/ "ID_VIDEO" /0.jpg 
+                            url = "https://i.ytimg.com/vi/" + v + "/0.jpg" 
+                            smaller_pixmap = self.rezolvarePoza(url)
+                            label_image.setPixmap(smaller_pixmap)
         ####################################
         top_widget.setLayout(top_vertical_layout)
         self.scrollAreaClipuri.setWidget(top_widget) 
