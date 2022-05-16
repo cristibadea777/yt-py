@@ -1,10 +1,5 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-
-
-
-
-
 #IDEI VIITOR
 #scraping mai bun, sa ia toate rezultatele nu doar 10 cate ia acum - sau un nr de rezultate, 50
 #functie de cut al clipului - sa fac cumva sa il decarc in tempfile apoi sa fie cut
@@ -13,11 +8,15 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 #https://github.com/kokoko3k/xt7-player-mpv -- imi place cum arata si asta
 #facut programu executabil .exe
 #functionalitate mai avansata de download - selectare calitate/format/etc 
-
-
-
-
-
+#functionalitate memorare playlisturi, memorare numaru de clipuri din playlist daca exista 
+#-daca nr clipuri s-a marit, atunci incepe descarcarea playlistului 
+#-memorare URL clipuri - daca exista URL atunci se da skip se ia urmatoru (cred ca e mai rapid decat daca las yt-dlp sa vada el),
+#Threaduri in python - in timp ce se descarca un clip sau un playlist, utilizatoru sa poate 
+#urmari clipuri
+#baza de date pentru LIbrarie (link playlisturi, nr videouri la descarcare playlist, si ce o sa mai fie)
+#https://www.programcreek.com/python/example/98358/youtube_dl.YoutubeDL ----- aici mai multe despre optiunile Youtube-Dl
+#--^ ca sa ia formatu dorit (vad ca le face webm din oficiu), calitatea cea mai buna sau selectata, etc 
+#in cod mai sunt idei, ctrl+f "idee"
 
 
 
@@ -43,67 +42,204 @@ from yt_dlp import YoutubeDL
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(1104, 431)
+        MainWindow.resize(1146, 465)
         locale.setlocale(locale.LC_NUMERIC,"C")
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
-        self.textCautare = QtWidgets.QTextEdit(self.centralwidget)
-        self.textCautare.setGeometry(QtCore.QRect(230, 20, 251, 41))
+        self.tabCautare = QtWidgets.QTabWidget(self.centralwidget)
+        self.tabCautare.setGeometry(QtCore.QRect(10, 10, 1121, 421))
+        self.tabCautare.setObjectName("tabCautare")
+        self.tab = QtWidgets.QWidget()
+        self.tab.setObjectName("tab")
+        self.pushButtonDescarca = QtWidgets.QPushButton(self.tab)
+        self.pushButtonDescarca.setGeometry(QtCore.QRect(979, 0, 101, 41))
         font = QtGui.QFont()
         font.setPointSize(12)
         font.setBold(True)
         font.setWeight(75)
-        self.textCautare.setFont(font)
-        self.textCautare.setObjectName("textCautare")
-        self.labelCautare = QtWidgets.QLabel(self.centralwidget)
-        self.labelCautare.setGeometry(QtCore.QRect(10, 30, 221, 20))
-        font = QtGui.QFont()
-        font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.labelActiune = QtWidgets.QLabel(self.centralwidget)
-        self.labelActiune.setGeometry(QtCore.QRect(560, 20, 310, 41))
+        self.pushButtonDescarca.setFont(font)
+        self.pushButtonDescarca.setObjectName("pushButtonDescarca")
+        self.widgetVideo = QtWidgets.QWidget(self.tab)
+        self.widgetVideo.setGeometry(QtCore.QRect(550, 50, 531, 311))
+        self.widgetVideo.setObjectName("widgetVideo")
+        self.labelActiune = QtWidgets.QLabel(self.tab)
+        self.labelActiune.setGeometry(QtCore.QRect(560, 0, 221, 41))
         self.labelActiune.setObjectName("labelActiune")
-        self.labelActiune.setFont(font)
-        font = QtGui.QFont()
-        font.setPointSize(12)
-        font.setBold(True)
-        font.setWeight(75)
-        self.labelCautare.setFont(font)
-        self.labelCautare.setObjectName("labelCautare")
-        self.pushButtonCautare = QtWidgets.QPushButton(self.centralwidget)
-        self.pushButtonCautare.setGeometry(QtCore.QRect(490, 20, 51, 41))
+        self.pushButtonCautare = QtWidgets.QPushButton(self.tab)
+        self.pushButtonCautare.setGeometry(QtCore.QRect(490, 0, 51, 41))
         font = QtGui.QFont()
         font.setPointSize(10)
         font.setBold(True)
         font.setWeight(75)
         self.pushButtonCautare.setFont(font)
         self.pushButtonCautare.setObjectName("pushButtonCautare")
-        self.scrollAreaClipuri = QtWidgets.QScrollArea(self.centralwidget)
-        self.scrollAreaClipuri.setGeometry(QtCore.QRect(10, 70, 531, 311))
+        self.labelCautare = QtWidgets.QLabel(self.tab)
+        self.labelCautare.setGeometry(QtCore.QRect(10, 10, 221, 20))
+        font = QtGui.QFont()
+        font.setPointSize(12)
+        font.setBold(True)
+        font.setWeight(75)
+        self.labelCautare.setFont(font)
+        self.labelCautare.setObjectName("labelCautare")
+        self.textCautare = QtWidgets.QTextEdit(self.tab)
+        self.textCautare.setGeometry(QtCore.QRect(230, 0, 251, 41))
+        font = QtGui.QFont()
+        font.setPointSize(12)
+        font.setBold(True)
+        font.setWeight(75)
+        self.textCautare.setFont(font)
+        self.textCautare.setObjectName("textCautare")
+        self.scrollAreaClipuri = QtWidgets.QScrollArea(self.tab)
+        self.scrollAreaClipuri.setGeometry(QtCore.QRect(10, 50, 531, 311))
         self.scrollAreaClipuri.setWidgetResizable(True)
         self.scrollAreaClipuri.setObjectName("scrollAreaClipuri")
         self.scrollAreaWidgetContents = QtWidgets.QWidget()
         self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 525, 305))
         self.scrollAreaWidgetContents.setObjectName("scrollAreaWidgetContents")
         self.scrollAreaClipuri.setWidget(self.scrollAreaWidgetContents)
-        self.widgetVideo = QtWidgets.QWidget(self.centralwidget)
-        self.widgetVideo.setGeometry(QtCore.QRect(550, 70, 531, 311))
-        self.widgetVideo.setObjectName("widgetVideo")
-        self.pushButtonDescarca = QtWidgets.QPushButton(self.centralwidget)
-        self.pushButtonDescarca.setGeometry(QtCore.QRect(979, 20, 101, 41))
+        self.tabCautare.addTab(self.tab, "")
+        self.tab_3 = QtWidgets.QWidget()
+        self.tab_3.setObjectName("tab_3")
+        self.tabCautare.addTab(self.tab_3, "")
+        self.tab_5 = QtWidgets.QWidget()
+        self.tab_5.setObjectName("tab_5")
+        self.tabCautare.addTab(self.tab_5, "")
+        self.tabTaieVideo = QtWidgets.QWidget()
+        self.tabTaieVideo.setObjectName("tabTaieVideo")
+        self.textTaieClip = QtWidgets.QTextEdit(self.tabTaieVideo)
+        self.textTaieClip.setGeometry(QtCore.QRect(110, 10, 371, 50))
         font = QtGui.QFont()
         font.setPointSize(12)
         font.setBold(True)
         font.setWeight(75)
-        
-        self.pushButtonDescarca.setFont(font)
-        self.pushButtonDescarca.setObjectName("pushButtonDescarca")
+        self.textTaieClip.setFont(font)
+        self.textTaieClip.setObjectName("textTaieClip")
+        self.pushButtonOkTaie = QtWidgets.QPushButton(self.tabTaieVideo)
+        self.pushButtonOkTaie.setGeometry(QtCore.QRect(490, 10, 51, 41))
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.pushButtonOkTaie.setFont(font)
+        self.pushButtonOkTaie.setObjectName("pushButtonOkTaie")
+        self.labelTaie = QtWidgets.QLabel(self.tabTaieVideo)
+        self.labelTaie.setGeometry(QtCore.QRect(10, 20, 91, 20))
+        font = QtGui.QFont()
+        font.setPointSize(12)
+        font.setBold(True)
+        font.setWeight(75)
+        self.labelTaie.setFont(font)
+        self.labelTaie.setObjectName("labelTaie")
+        self.textInceputOra = QtWidgets.QTextEdit(self.tabTaieVideo)
+        self.textInceputOra.setGeometry(QtCore.QRect(130, 80, 41, 41))
+        font = QtGui.QFont()
+        font.setPointSize(12)
+        font.setBold(True)
+        font.setWeight(75)
+        self.textInceputOra.setFont(font)
+        self.textInceputOra.setObjectName("textInceputOra")
+        self.labelInceput = QtWidgets.QLabel(self.tabTaieVideo)
+        self.labelInceput.setGeometry(QtCore.QRect(10, 90, 121, 20))
+        font = QtGui.QFont()
+        font.setPointSize(12)
+        font.setBold(True)
+        font.setWeight(75)
+        self.labelInceput.setFont(font)
+        self.labelInceput.setObjectName("labelInceput")
+        self.labelSfarsit = QtWidgets.QLabel(self.tabTaieVideo)
+        self.labelSfarsit.setGeometry(QtCore.QRect(10, 140, 121, 20))
+        font = QtGui.QFont()
+        font.setPointSize(12)
+        font.setBold(True)
+        font.setWeight(75)
+        self.labelSfarsit.setFont(font)
+        self.labelSfarsit.setObjectName("labelSfarsit")
+        self.textInceputMinut = QtWidgets.QTextEdit(self.tabTaieVideo)
+        self.textInceputMinut.setGeometry(QtCore.QRect(180, 80, 41, 41))
+        font = QtGui.QFont()
+        font.setPointSize(12)
+        font.setBold(True)
+        font.setWeight(75)
+        self.textInceputMinut.setFont(font)
+        self.textInceputMinut.setObjectName("textInceputMinut")
+        self.textInceputSecunda = QtWidgets.QTextEdit(self.tabTaieVideo)
+        self.textInceputSecunda.setGeometry(QtCore.QRect(230, 80, 41, 41))
+        font = QtGui.QFont()
+        font.setPointSize(12)
+        font.setBold(True)
+        font.setWeight(75)
+        self.textInceputSecunda.setFont(font)
+        self.textInceputSecunda.setObjectName("textInceputSecunda")
+        self.textSfarsitOra = QtWidgets.QTextEdit(self.tabTaieVideo)
+        self.textSfarsitOra.setGeometry(QtCore.QRect(130, 130, 41, 41))
+        font = QtGui.QFont()
+        font.setPointSize(12)
+        font.setBold(True)
+        font.setWeight(75)
+        self.textSfarsitOra.setFont(font)
+        self.textSfarsitOra.setObjectName("textSfarsitOra")
+        self.textSfarsitSecunda = QtWidgets.QTextEdit(self.tabTaieVideo)
+        self.textSfarsitSecunda.setGeometry(QtCore.QRect(230, 130, 41, 41))
+        font = QtGui.QFont()
+        font.setPointSize(12)
+        font.setBold(True)
+        font.setWeight(75)
+        self.textSfarsitSecunda.setFont(font)
+        self.textSfarsitSecunda.setObjectName("textSfarsitSecunda")
+        self.textSfarsitMinut = QtWidgets.QTextEdit(self.tabTaieVideo)
+        self.textSfarsitMinut.setGeometry(QtCore.QRect(180, 130, 41, 41))
+        font = QtGui.QFont()
+        font.setPointSize(12)
+        font.setBold(True)
+        font.setWeight(75)
+        self.textSfarsitMinut.setFont(font)
+        self.textSfarsitMinut.setObjectName("textSfarsitMinut")
+        self.labelH = QtWidgets.QLabel(self.tabTaieVideo)
+        self.labelH.setGeometry(QtCore.QRect(140, 60, 21, 20))
+        font = QtGui.QFont()
+        font.setPointSize(12)
+        font.setBold(True)
+        font.setWeight(75)
+        self.labelH.setFont(font)
+        self.labelH.setObjectName("labelH")
+        self.labelM = QtWidgets.QLabel(self.tabTaieVideo)
+        self.labelM.setGeometry(QtCore.QRect(190, 60, 21, 20))
+        font = QtGui.QFont()
+        font.setPointSize(12)
+        font.setBold(True)
+        font.setWeight(75)
+        self.labelM.setFont(font)
+        self.labelM.setObjectName("labelM")
+        self.labelS = QtWidgets.QLabel(self.tabTaieVideo)
+        self.labelS.setGeometry(QtCore.QRect(240, 60, 21, 21))
+        font = QtGui.QFont()
+        font.setPointSize(12)
+        font.setBold(True)
+        font.setWeight(75)
+        self.labelS.setFont(font)
+        self.labelS.setObjectName("labelS")
+        self.pushButonTaieClip = QtWidgets.QPushButton(self.tabTaieVideo)
+        self.pushButonTaieClip.setGeometry(QtCore.QRect(130, 180, 141, 41))
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.pushButonTaieClip.setFont(font)
+        self.pushButonTaieClip.setObjectName("pushButonTaieClip")
+        self.labelActiuneTaie = QtWidgets.QLabel(self.tabTaieVideo)
+        self.labelActiuneTaie.setGeometry(QtCore.QRect(560, 10, 221, 41))
+        self.labelActiuneTaie.setObjectName("labelActiuneTaie")
+        self.widgetVideoTaie = QtWidgets.QWidget(self.tabTaieVideo)
+        self.widgetVideoTaie.setGeometry(QtCore.QRect(550, 60, 531, 301))
+        self.widgetVideoTaie.setObjectName("widgetVideoTaie")
+        self.tabCautare.addTab(self.tabTaieVideo, "")
+        self.tab_2 = QtWidgets.QWidget()
+        self.tab_2.setObjectName("tab_2")
+        self.tabCautare.addTab(self.tab_2, "")
+        self.tab_6 = QtWidgets.QWidget()
+        self.tab_6.setObjectName("tab_6")
+        self.tabCautare.addTab(self.tab_6, "")
         MainWindow.setCentralWidget(self.centralwidget)
-        self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 1104, 26))
-        self.menubar.setObjectName("menubar")
-        MainWindow.setMenuBar(self.menubar)
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
         MainWindow.setStatusBar(self.statusbar)
@@ -113,14 +249,29 @@ class Ui_MainWindow(object):
         #####################################    
         self.pushButtonCautare.clicked.connect(self.clickCautare)
         self.pushButtonDescarca.clicked.connect(self.clickDescarcaVideo)
+        self.pushButtonOkTaie.clicked.connect(self.clickPlayVideoTaie)
+        self.pushButonTaieClip.clicked.connect(self.clickTaieVideo)
         #####################################
         #Pentru MPV
         #https://github.com/jaseg/python-mpv
         #####################################    
+        #player cautare
         self.container = self.widgetVideo
         self.container.setAttribute(Qt.WA_DontCreateNativeAncestors)
         self.container.setAttribute(Qt.WA_NativeWindow)
         self.player = mpv.MPV(wid=str(int(self.container.winId())),
+                vo='x11', # You may not need this
+                log_handler=print,
+                loglevel='debug',
+                input_default_bindings=True,
+                input_vo_keyboard=True,
+                osc=True
+                )
+        #player taie
+        self.container = self.widgetVideoTaie
+        self.container.setAttribute(Qt.WA_DontCreateNativeAncestors)
+        self.container.setAttribute(Qt.WA_NativeWindow)
+        self.playerTaie = mpv.MPV(wid=str(int(self.container.winId())),
                 vo='x11', # You may not need this
                 log_handler=print,
                 loglevel='debug',
@@ -137,10 +288,32 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
-        self.labelCautare.setText(_translate("MainWindow", "Cautati clipuri pe YouTube:"))
-        self.pushButtonCautare.setText(_translate("MainWindow", "OK"))
         self.pushButtonDescarca.setText(_translate("MainWindow", "Descarca"))
-        self.labelActiune.setText(_translate("MainWindow", "Actiune:"))
+        self.labelActiune.setText(_translate("MainWindow", "Actiune:..."))
+        self.pushButtonCautare.setText(_translate("MainWindow", "OK"))
+        self.labelCautare.setText(_translate("MainWindow", "Cautati clipuri pe YouTube:"))
+        self.tabCautare.setTabText(self.tabCautare.indexOf(self.tab), _translate("MainWindow", "Cauta pe YouTube"))
+        self.tabCautare.setTabText(self.tabCautare.indexOf(self.tab_3), _translate("MainWindow", "Librarie"))
+        self.tabCautare.setTabText(self.tabCautare.indexOf(self.tab_5), _translate("MainWindow", "Adauga Playlist"))
+        self.pushButtonOkTaie.setText(_translate("MainWindow", "OK"))
+        self.labelTaie.setText(_translate("MainWindow", "Taie clipul"))
+        self.textInceputOra.setPlaceholderText(_translate("MainWindow", "00"))
+        self.labelInceput.setText(_translate("MainWindow", "Timp inceput"))
+        self.labelSfarsit.setText(_translate("MainWindow", "Timp sfarsit"))
+        self.textInceputMinut.setPlaceholderText(_translate("MainWindow", "00"))
+        self.textInceputSecunda.setPlaceholderText(_translate("MainWindow", "00"))
+        self.textSfarsitOra.setPlaceholderText(_translate("MainWindow", "00"))
+        self.textSfarsitSecunda.setPlaceholderText(_translate("MainWindow", "00"))
+        self.textSfarsitMinut.setPlaceholderText(_translate("MainWindow", "00"))
+        self.labelH.setText(_translate("MainWindow", "H"))
+        self.labelM.setText(_translate("MainWindow", "M"))
+        self.labelS.setText(_translate("MainWindow", "S"))
+        self.pushButonTaieClip.setText(_translate("MainWindow", "Taie clipul"))
+        self.labelActiuneTaie.setText(_translate("MainWindow", "Actiune:..."))
+        self.tabCautare.setTabText(self.tabCautare.indexOf(self.tabTaieVideo), _translate("MainWindow", "Taie videoclip"))
+        self.tabCautare.setTabText(self.tabCautare.indexOf(self.tab_2), _translate("MainWindow", "Descarca videoclip"))
+        self.tabCautare.setTabText(self.tabCautare.indexOf(self.tab_6), _translate("MainWindow", "Setari"))
+
 
     ####################################
     #scrape
@@ -205,13 +378,22 @@ class Ui_MainWindow(object):
     #####################################
     
     #####################################
-    #playVideo
-    def playVideo(self, v):
+    #clickPlayVideo
+    def clickPlayVideo(self, v):
         self.labelActiune.setText("Actiune: Incarcare videoclip...")
         self.labelActiune.repaint()
         self.video_curent = "https://www.youtube.com/watch?v=" + v
         self.player.play(self.video_curent)
     #####################################    
+
+    #####################################
+    def clickPlayVideoTaie(self):
+        link = self.textTaieClip.toPlainText()
+        self.video_curent_taie = link
+        self.labelActiuneTaie.setText("Actiune: Incarcare videoclip...")
+        self.labelActiuneTaie.repaint()
+        self.playerTaie.play(link)
+    #####################################
 
     #####################################
     #adaugareContent
@@ -264,7 +446,7 @@ class Ui_MainWindow(object):
                         ####################################
                         #butonul play va avea Id-ul videoId. cand dam click, se va lua Id-ul
                         if k == "videoId" and len(v) == 11:
-                            push_button.clicked.connect(lambda checked, index=v: self.playVideo(index))
+                            push_button.clicked.connect(lambda checked, index=v: self.clickPlayVideo(index))
                             #URL-ul thumbnail-ului, care e compus din ID-ul clipului
                             #Nu mai fac scrape la URL direct pentru ca thumbnailurile #shorts nu merg
                             #2.jpg, 1.jpg la shorts nu merg, dar 0.jpg merge. 
@@ -281,8 +463,8 @@ class Ui_MainWindow(object):
     ####################################
     
     #butoane
-    #####################################
-    #####################################
+    ################################################################
+    ################################################################
     def clickCautare(self):
         cautare = self.textCautare.toPlainText()
         content = self.scrapeCautare(cautare)
@@ -304,6 +486,64 @@ class Ui_MainWindow(object):
             self.labelActiune.setText("Nu se poate descarca videoclipul. Eroare yt-dlp")
             self.labelActiune.repaint()
     ##################################### 
+    #clickTaieVideo
+    def clickTaieVideo(self):
+        try:
+            self.labelActiuneTaie.setText("Actiune: Descarcare videoclip...")
+            self.labelActiuneTaie.repaint()
+            #idee
+            #Asta cu extract e util pentru formatarea numelui filei. Utilizatoru sa aleaga cum vrea sa fie fila descarcata
+            #Sau cred ca mai rapid ar fi facand scraping linkului
+            with YoutubeDL() as ydl: 
+                info_dict = ydl.extract_info(self.video_curent_taie, download=True)
+                video_id = info_dict.get("id", None)
+                video_title = info_dict.get('title', None)
+                print("Titlu: " + video_title)
+                print("ID: " + video_id)
+            #Numele clipului descarcat, default este in formatul "nume_clipSPATIU[id_clip].ext"
+            filename = video_title + " " + "[" + video_id + "]"
+            #Acu verificam extensia ca sa vedem ce nume final are clipul descarcat
+            if os.path.isfile(filename+'.mkv'):
+                extension = '.mkv'
+                filename= filename+extension
+            elif os.path.isfile(filename+'.mp4'):
+                extension = '.mp4'
+                filename= filename+extension
+            elif os.path.isfile(filename+'.webm'):
+                extension = '.webm'
+                filename= filename+extension
+            #pentru a descarca in temp- nu utilizez
+            #cale = tempfile.gettempdir()
+            #try:
+            #    os.chdir(cale)
+            #except Exception as e:
+            #    print("Directorul: {0} nu exista".format(cale))
+            #
+            #ydl_opts = {'outtmpl': cale + 'nume_pt_video_descarcat'} -- calea setata + nume video ca argumente
+            #ydl_opts = {'outtmpl': 'nume_pt_video_descarcat'} -- doar numele ce-l vrem noi
+             #with YoutubeDL(ydl_opts) as ydl:
+            #    ydl.download(self.video_curent_taie)
+            #
+            self.labelActiuneTaie.setText("Actiune: Taiere videoclip...")
+            self.labelActiuneTaie.repaint()
+            os.system("ffmpeg -i " + "'" + filename + "'" + " -ss " + self.textInceputOra.toPlainText() + ":" + self.textInceputMinut.toPlainText() + ":" + self.textInceputSecunda.toPlainText() + " -to " + self.textSfarsitOra.toPlainText() + ":" + self.textSfarsitMinut.toPlainText() + ":" + self.textSfarsitSecunda.toPlainText() + " -c:v copy -c:a copy" + " 'Taiat_"+filename+"'")
+            self.labelActiuneTaie.setText("Actiune: Stergere videoclip initial...")
+            self.labelActiuneTaie.repaint()
+            #idee
+            #eventual o bifa daca vrea sa stearga si clipul original
+            #os.remove(filename)
+            self.labelActiuneTaie.setText("Videoclip taiat in: " + os.getcwd())
+            self.labelActiuneTaie.repaint()
+           
+            #self.labelActiuneTaie.setText("Actiune: Taiere videoclip...")
+            #self.labelActiuneTaie.repaint()
+
+
+        except Exception as e:
+            print("Eroare. Nu se poate taia clipul.")
+            self.labelActiuneTaie.setText("Eroare. Nu se poate taia clipul.")
+            self.labelActiuneTaie.repaint()
+            print(e)
 
 if __name__ == "__main__":
     import sys
