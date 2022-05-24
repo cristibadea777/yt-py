@@ -11,14 +11,18 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 #functionalitate memorare playlisturi, memorare numaru de clipuri din playlist daca exista 
 #-daca nr clipuri s-a marit, atunci incepe descarcarea playlistului 
 #-memorare URL clipuri - daca exista URL atunci se da skip se ia urmatoru (cred ca e mai rapid decat daca las yt-dlp sa vada el),
-#Threaduri in python - in timp ce se descarca un clip sau un playlist, utilizatoru sa poate 
-#urmari clipuri
+#Threaduri in python - in timp ce se descarca un clip sau un playlist, utilizatoru sa poate  
+#urmari clipuri https://realpython.com/python-pyqt-qthread/
 #baza de date pentru LIbrarie (link playlisturi, nr videouri la descarcare playlist, si ce o sa mai fie)
 #https://www.programcreek.com/python/example/98358/youtube_dl.YoutubeDL ----- aici mai multe despre optiunile Youtube-Dl
 #--^ ca sa ia formatu dorit (vad ca le face webm din oficiu), calitatea cea mai buna sau selectata, etc 
 #in cod mai sunt idei, ctrl+f "idee"
-
-
+#posibil ca sa scot diferitele playeruri din taburi, sa fac taburile pe jumate si playeru sa fie doar unu singur
+#la cautare clipuri - pus buton descarca pt fiecare-sa se duca apoi pe tabu Desarcare unde are mai multe optiuni, sau optiunile sa fie ca la MediaHuman si in setari sa se puna si conventia de nume
+#la cautare clipuri buton de copiere link si taiere
+#https://github.com/oleksis/youtube-dl-gui
+#https://www.youtube.com/watch?v=tGbl6a8a7ME
+#https://www.reddit.com/r/youtubedl/comments/tme3xv/help_using_youtube_dlp_in_python_desktop_app/ - de vazut. pt descarcare clipuri in format si nume fila, autentificare
 
 
 import mpv
@@ -38,6 +42,9 @@ import base64
 import tempfile
 import os
 from yt_dlp import YoutubeDL
+import re
+from pytube import YouTube
+from pytube import Playlist
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -46,12 +53,12 @@ class Ui_MainWindow(object):
         locale.setlocale(locale.LC_NUMERIC,"C")
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
-        self.tabCautare = QtWidgets.QTabWidget(self.centralwidget)
-        self.tabCautare.setGeometry(QtCore.QRect(10, 10, 1121, 421))
+        self.taburi = QtWidgets.QTabWidget(self.centralwidget)
+        self.taburi.setGeometry(QtCore.QRect(10, 10, 1121, 421))
+        self.taburi.setObjectName("taburi")
+        self.tabCautare = QtWidgets.QWidget()
         self.tabCautare.setObjectName("tabCautare")
-        self.tab = QtWidgets.QWidget()
-        self.tab.setObjectName("tab")
-        self.pushButtonDescarca = QtWidgets.QPushButton(self.tab)
+        self.pushButtonDescarca = QtWidgets.QPushButton(self.tabCautare)
         self.pushButtonDescarca.setGeometry(QtCore.QRect(979, 0, 101, 41))
         font = QtGui.QFont()
         font.setPointSize(12)
@@ -59,13 +66,13 @@ class Ui_MainWindow(object):
         font.setWeight(75)
         self.pushButtonDescarca.setFont(font)
         self.pushButtonDescarca.setObjectName("pushButtonDescarca")
-        self.widgetVideo = QtWidgets.QWidget(self.tab)
+        self.widgetVideo = QtWidgets.QWidget(self.tabCautare)
         self.widgetVideo.setGeometry(QtCore.QRect(550, 50, 531, 311))
         self.widgetVideo.setObjectName("widgetVideo")
-        self.labelActiune = QtWidgets.QLabel(self.tab)
+        self.labelActiune = QtWidgets.QLabel(self.tabCautare)
         self.labelActiune.setGeometry(QtCore.QRect(560, 0, 221, 41))
         self.labelActiune.setObjectName("labelActiune")
-        self.pushButtonCautare = QtWidgets.QPushButton(self.tab)
+        self.pushButtonCautare = QtWidgets.QPushButton(self.tabCautare)
         self.pushButtonCautare.setGeometry(QtCore.QRect(490, 0, 51, 41))
         font = QtGui.QFont()
         font.setPointSize(10)
@@ -73,7 +80,7 @@ class Ui_MainWindow(object):
         font.setWeight(75)
         self.pushButtonCautare.setFont(font)
         self.pushButtonCautare.setObjectName("pushButtonCautare")
-        self.labelCautare = QtWidgets.QLabel(self.tab)
+        self.labelCautare = QtWidgets.QLabel(self.tabCautare)
         self.labelCautare.setGeometry(QtCore.QRect(10, 10, 221, 20))
         font = QtGui.QFont()
         font.setPointSize(12)
@@ -81,7 +88,7 @@ class Ui_MainWindow(object):
         font.setWeight(75)
         self.labelCautare.setFont(font)
         self.labelCautare.setObjectName("labelCautare")
-        self.textCautare = QtWidgets.QTextEdit(self.tab)
+        self.textCautare = QtWidgets.QTextEdit(self.tabCautare)
         self.textCautare.setGeometry(QtCore.QRect(230, 0, 251, 41))
         font = QtGui.QFont()
         font.setPointSize(12)
@@ -89,7 +96,7 @@ class Ui_MainWindow(object):
         font.setWeight(75)
         self.textCautare.setFont(font)
         self.textCautare.setObjectName("textCautare")
-        self.scrollAreaClipuri = QtWidgets.QScrollArea(self.tab)
+        self.scrollAreaClipuri = QtWidgets.QScrollArea(self.tabCautare)
         self.scrollAreaClipuri.setGeometry(QtCore.QRect(10, 50, 531, 311))
         self.scrollAreaClipuri.setWidgetResizable(True)
         self.scrollAreaClipuri.setObjectName("scrollAreaClipuri")
@@ -97,17 +104,55 @@ class Ui_MainWindow(object):
         self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 525, 305))
         self.scrollAreaWidgetContents.setObjectName("scrollAreaWidgetContents")
         self.scrollAreaClipuri.setWidget(self.scrollAreaWidgetContents)
-        self.tabCautare.addTab(self.tab, "")
+        self.taburi.addTab(self.tabCautare, "")
         self.tab_3 = QtWidgets.QWidget()
         self.tab_3.setObjectName("tab_3")
-        self.tabCautare.addTab(self.tab_3, "")
-        self.tab_5 = QtWidgets.QWidget()
-        self.tab_5.setObjectName("tab_5")
-        self.tabCautare.addTab(self.tab_5, "")
+        self.taburi.addTab(self.tab_3, "")
+        self.tabDescarcaPlaylist = QtWidgets.QWidget()
+        self.tabDescarcaPlaylist.setObjectName("tabDescarcaPlaylist")
+        self.scrollAreaClipuriPlaylist = QtWidgets.QScrollArea(self.tabDescarcaPlaylist)
+        self.scrollAreaClipuriPlaylist.setGeometry(QtCore.QRect(0, 50, 531, 311))
+        self.scrollAreaClipuriPlaylist.setWidgetResizable(True)
+        self.scrollAreaClipuriPlaylist.setObjectName("scrollAreaClipuriPlaylist")
+        self.scrollAreaWidgetContents_2 = QtWidgets.QWidget()
+        self.scrollAreaWidgetContents_2.setGeometry(QtCore.QRect(0, 0, 525, 305))
+        self.scrollAreaWidgetContents_2.setObjectName("scrollAreaWidgetContents_2")
+        self.scrollAreaClipuriPlaylist.setWidget(self.scrollAreaWidgetContents_2)
+        self.textLinkPlaylist = QtWidgets.QTextEdit(self.tabDescarcaPlaylist)
+        self.textLinkPlaylist.setGeometry(QtCore.QRect(120, 0, 351, 41))
+        font = QtGui.QFont()
+        font.setPointSize(12)
+        font.setBold(True)
+        font.setWeight(75)
+        self.textLinkPlaylist.setFont(font)
+        self.textLinkPlaylist.setObjectName("textLinkPlaylist")
+        self.labelActiunePlaylist = QtWidgets.QLabel(self.tabDescarcaPlaylist)
+        self.labelActiunePlaylist.setGeometry(QtCore.QRect(550, 0, 221, 41))
+        self.labelActiunePlaylist.setObjectName("labelActiunePlaylist")
+        self.widgetVideoPlaylist = QtWidgets.QWidget(self.tabDescarcaPlaylist)
+        self.widgetVideoPlaylist.setGeometry(QtCore.QRect(540, 50, 531, 311))
+        self.widgetVideoPlaylist.setObjectName("widgetVideoPlaylist")
+        self.pushButtonLinkPlaylist = QtWidgets.QPushButton(self.tabDescarcaPlaylist)
+        self.pushButtonLinkPlaylist.setGeometry(QtCore.QRect(480, 0, 51, 41))
+        font = QtGui.QFont() 
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.pushButtonLinkPlaylist.setFont(font)
+        self.pushButtonLinkPlaylist.setObjectName("pushButtonLinkPlaylist")
+        self.labelLinkPlaylist = QtWidgets.QLabel(self.tabDescarcaPlaylist)
+        self.labelLinkPlaylist.setGeometry(QtCore.QRect(0, 10, 111, 20))
+        font = QtGui.QFont()
+        font.setPointSize(12)
+        font.setBold(True)
+        font.setWeight(75)
+        self.labelLinkPlaylist.setFont(font)
+        self.labelLinkPlaylist.setObjectName("labelLinkPlaylist")
+        self.taburi.addTab(self.tabDescarcaPlaylist, "")
         self.tabTaieVideo = QtWidgets.QWidget()
         self.tabTaieVideo.setObjectName("tabTaieVideo")
         self.textTaieClip = QtWidgets.QTextEdit(self.tabTaieVideo)
-        self.textTaieClip.setGeometry(QtCore.QRect(110, 10, 371, 50))
+        self.textTaieClip.setGeometry(QtCore.QRect(110, 10, 371, 41))
         font = QtGui.QFont()
         font.setPointSize(12)
         font.setBold(True)
@@ -232,13 +277,13 @@ class Ui_MainWindow(object):
         self.widgetVideoTaie = QtWidgets.QWidget(self.tabTaieVideo)
         self.widgetVideoTaie.setGeometry(QtCore.QRect(550, 60, 531, 301))
         self.widgetVideoTaie.setObjectName("widgetVideoTaie")
-        self.tabCautare.addTab(self.tabTaieVideo, "")
+        self.taburi.addTab(self.tabTaieVideo, "")
         self.tab_2 = QtWidgets.QWidget()
         self.tab_2.setObjectName("tab_2")
-        self.tabCautare.addTab(self.tab_2, "")
+        self.taburi.addTab(self.tab_2, "")
         self.tab_6 = QtWidgets.QWidget()
         self.tab_6.setObjectName("tab_6")
-        self.tabCautare.addTab(self.tab_6, "")
+        self.taburi.addTab(self.tab_6, "")
         MainWindow.setCentralWidget(self.centralwidget)
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
@@ -251,6 +296,7 @@ class Ui_MainWindow(object):
         self.pushButtonDescarca.clicked.connect(self.clickDescarcaVideo)
         self.pushButtonOkTaie.clicked.connect(self.clickPlayVideoTaie)
         self.pushButonTaieClip.clicked.connect(self.clickTaieVideo)
+        self.pushButtonLinkPlaylist.clicked.connect(self.clickOkPlaylist)
         #####################################
         #Pentru MPV
         #https://github.com/jaseg/python-mpv
@@ -279,6 +325,20 @@ class Ui_MainWindow(object):
                 input_vo_keyboard=True,
                 osc=True
                 )
+        #player playlist
+        self.container = self.widgetVideoPlaylist
+        self.container.setAttribute(Qt.WA_DontCreateNativeAncestors)
+        self.container.setAttribute(Qt.WA_NativeWindow)
+        self.playerPlaylist = mpv.MPV(wid=str(int(self.container.winId())),
+                vo='x11', # You may not need this
+                log_handler=print,
+                loglevel='debug',
+                input_default_bindings=True,
+                input_vo_keyboard=True,
+                osc=True
+                )
+        #playlist
+        self.numar_clipuri_playlist = 0
         #####################################
 
 
@@ -292,9 +352,12 @@ class Ui_MainWindow(object):
         self.labelActiune.setText(_translate("MainWindow", "Actiune:..."))
         self.pushButtonCautare.setText(_translate("MainWindow", "OK"))
         self.labelCautare.setText(_translate("MainWindow", "Cautati clipuri pe YouTube:"))
-        self.tabCautare.setTabText(self.tabCautare.indexOf(self.tab), _translate("MainWindow", "Cauta pe YouTube"))
-        self.tabCautare.setTabText(self.tabCautare.indexOf(self.tab_3), _translate("MainWindow", "Librarie"))
-        self.tabCautare.setTabText(self.tabCautare.indexOf(self.tab_5), _translate("MainWindow", "Adauga Playlist"))
+        self.taburi.setTabText(self.taburi.indexOf(self.tabCautare), _translate("MainWindow", "Cauta pe YouTube"))
+        self.taburi.setTabText(self.taburi.indexOf(self.tab_3), _translate("MainWindow", "Librarie"))
+        self.labelActiunePlaylist.setText(_translate("MainWindow", "Actiune:..."))
+        self.pushButtonLinkPlaylist.setText(_translate("MainWindow", "OK"))
+        self.labelLinkPlaylist.setText(_translate("MainWindow", "Link playlist:"))
+        self.taburi.setTabText(self.taburi.indexOf(self.tabDescarcaPlaylist), _translate("MainWindow", "Descarca Playlist"))
         self.pushButtonOkTaie.setText(_translate("MainWindow", "OK"))
         self.labelTaie.setText(_translate("MainWindow", "Taie clipul"))
         self.textInceputOra.setPlaceholderText(_translate("MainWindow", "00"))
@@ -310,10 +373,9 @@ class Ui_MainWindow(object):
         self.labelS.setText(_translate("MainWindow", "S"))
         self.pushButonTaieClip.setText(_translate("MainWindow", "Taie clipul"))
         self.labelActiuneTaie.setText(_translate("MainWindow", "Actiune:..."))
-        self.tabCautare.setTabText(self.tabCautare.indexOf(self.tabTaieVideo), _translate("MainWindow", "Taie videoclip"))
-        self.tabCautare.setTabText(self.tabCautare.indexOf(self.tab_2), _translate("MainWindow", "Descarca videoclip"))
-        self.tabCautare.setTabText(self.tabCautare.indexOf(self.tab_6), _translate("MainWindow", "Setari"))
-
+        self.taburi.setTabText(self.taburi.indexOf(self.tabTaieVideo), _translate("MainWindow", "Taie videoclip"))
+        self.taburi.setTabText(self.taburi.indexOf(self.tab_2), _translate("MainWindow", "Descarca videoclip"))
+        self.taburi.setTabText(self.taburi.indexOf(self.tab_6), _translate("MainWindow", "Setari"))
 
     ####################################
     #scrape
@@ -376,24 +438,7 @@ class Ui_MainWindow(object):
             return smaller_pixmap
             #fila temporara se distruge dupa ce iesim din clauza "with"
     #####################################
-    
-    #####################################
-    #clickPlayVideo
-    def clickPlayVideo(self, v):
-        self.labelActiune.setText("Actiune: Incarcare videoclip...")
-        self.labelActiune.repaint()
-        self.video_curent = "https://www.youtube.com/watch?v=" + v
-        self.player.play(self.video_curent)
-    #####################################    
 
-    #####################################
-    def clickPlayVideoTaie(self):
-        link = self.textTaieClip.toPlainText()
-        self.video_curent_taie = link
-        self.labelActiuneTaie.setText("Actiune: Incarcare videoclip...")
-        self.labelActiuneTaie.repaint()
-        self.playerTaie.play(link)
-    #####################################
 
     #####################################
     #adaugareContent
@@ -444,7 +489,7 @@ class Ui_MainWindow(object):
                         if k == "longBylineText" and "runs" in v:
                             group_box.setTitle(v["runs"][0]["text"] + " - " + titlu)
                         ####################################
-                        #butonul play va avea Id-ul videoId. cand dam click, se va lua Id-ul
+                        #indexul este URL-ul video-ului (v)
                         if k == "videoId" and len(v) == 11:
                             push_button.clicked.connect(lambda checked, index=v: self.clickPlayVideo(index))
                             #URL-ul thumbnail-ului, care e compus din ID-ul clipului
@@ -486,6 +531,26 @@ class Ui_MainWindow(object):
             self.labelActiune.setText("Nu se poate descarca videoclipul. Eroare yt-dlp")
             self.labelActiune.repaint()
     ##################################### 
+    #clickPlayVideo
+    def clickPlayVideo(self, v):
+        self.labelActiune.setText("Actiune: Incarcare videoclip...")
+        self.labelActiune.repaint()
+        self.video_curent = "https://www.youtube.com/watch?v=" + v
+        self.player.play(self.video_curent)
+    #####################################
+    def clickPlayVideoPlaylist(self, v):
+        self.labelActiunePlaylist.setText("Actiune: Incarcare videoclip...")
+        self.labelActiunePlaylist.repaint()
+        self.video_curent = "https://www.youtube.com/watch?v=" + v
+        self.playerPlaylist.play(self.video_curent)
+    #####################################
+    def clickPlayVideoTaie(self):
+        link = self.textTaieClip.toPlainText()
+        self.video_curent_taie = link
+        self.labelActiuneTaie.setText("Actiune: Incarcare videoclip...")
+        self.labelActiuneTaie.repaint()
+        self.playerTaie.play(link)
+    #####################################
     #clickTaieVideo
     def clickTaieVideo(self):
         try:
@@ -544,6 +609,80 @@ class Ui_MainWindow(object):
             self.labelActiuneTaie.setText("Eroare. Nu se poate taia clipul.")
             self.labelActiuneTaie.repaint()
             print(e)
+    #####################################
+    def clickOkPlaylist(self):
+        link_playlist = self.textLinkPlaylist.toPlainText()
+        playlist = Playlist(link_playlist)
+        playlist._video_regex = re.compile(r"\"url\":\"(/watch\?v=[\w-]*)")
+        self.numar_clipuri_playlist = len(playlist.video_urls)
+        print('Numar de clipuri in playlist: %s' %self.numar_clipuri_playlist)
+        self.adaugareContentPlaylist(playlist)
+    #####################################
+    #adaugareContentPlaylist
+    def adaugareContentPlaylist(self, playlist):
+        self.labelActiunePlaylist.setText("Actiune: Adaugare clipuri..."+str(self.numar_clipuri_playlist))
+        self.labelActiunePlaylist.repaint()
+        top_widget = QtWidgets.QWidget()
+        top_vertical_layout = QtWidgets.QVBoxLayout()
+        titlu = ""
+
+        #accesam lista playlist 
+        for url in playlist.video_urls:
+            #Asezat elemente
+            #group box, adaugat la vertical layout
+            group_box = QtWidgets.QGroupBox()
+            group_box.setCheckable(True)
+            group_box.setGeometry(QtCore.QRect(10, 20, 521, 141))
+            top_vertical_layout.addWidget(group_box)
+            #label imagine
+            label_image = QtWidgets.QLabel()
+            #buton play
+            push_button = QtWidgets.QPushButton()
+            push_button.setFixedSize(50, 50)
+            push_button.setText("▶︎")
+            font = QtGui.QFont()
+            font.setPointSize(20)
+            push_button.setFont(font)
+            #horizontal layout al group box
+            groupbox_horizontal_layout = QtWidgets.QHBoxLayout()
+            groupbox_horizontal_layout.addWidget(label_image)
+            groupbox_horizontal_layout.addWidget(push_button)
+            #Elementele nu vor avea spatii mari intre ele cu urmatoarele doua linii
+            groupbox_horizontal_layout.setSpacing(10) 
+            groupbox_horizontal_layout.addStretch(1) 
+            #vertical layout
+            group_box.setLayout(groupbox_horizontal_layout)
+            top_vertical_layout.addLayout(groupbox_horizontal_layout) 
+            
+            #Data pentru elemente
+            yt = YouTube(url) #pytube
+            titlu = yt.author + " - " + yt.title
+            group_box.setTitle(titlu)
+            push_button.clicked.connect(lambda checked, index=yt.video_id: self.clickPlayVideoPlaylist(index))
+            #URL-ul thumbnail-ului, care e compus din ID-ul clipului
+            #https://i.ytimg.com/vi/ "ID_VIDEO" /0.jpg  
+            #url = "https://i.ytimg.com/vi/" + yt.video_id + "/0.jpg"
+            #poate nu e nevoie de ^ si merge cu link-ul generat de pytube si pentru #shorts
+            smaller_pixmap = self.rezolvarePoza(yt.thumbnail_url)
+            label_image.setPixmap(smaller_pixmap)
+            self.numar_clipuri_playlist = self.numar_clipuri_playlist - 1
+            self.labelActiunePlaylist.setText("Actiune: Adaugare clipuri..."+str(self.numar_clipuri_playlist))
+            self.labelActiunePlaylist.repaint()
+            ####################################
+        ####################################
+        top_widget.setLayout(top_vertical_layout)
+        self.scrollAreaClipuriPlaylist.setWidget(top_widget) 
+        self.labelActiunePlaylist.setText("Actiune:")
+        self.labelActiunePlaylist.repaint()
+    ####################################
+
+
+
+
+############### Librarie, baza de date, adaugare playlist in librarie buton descarcare playlist
+
+
+
 
 if __name__ == "__main__":
     import sys
