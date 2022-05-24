@@ -45,6 +45,10 @@ from yt_dlp import YoutubeDL
 import re
 from pytube import YouTube
 from pytube import Playlist
+import sqlite3
+from datetime import datetime
+from playlist import Playlist as Clasa_Playlist
+from librarie import Librarie as ClasaLibrarie
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -340,6 +344,14 @@ class Ui_MainWindow(object):
         #playlist
         self.numar_clipuri_playlist = 0
         #####################################
+        #Baza de Date
+        #####################################
+        #Conexiune BD
+        conexiune = sqlite3.connect('librarie.db') #fisier pt baza de date. daca nu exista se creaza gol
+        cursor = conexiune.cursor()#cursor - ne permite sa executam comenzi SQL pentru conexiune
+        #Librarie
+        self.librarie = ClasaLibrarie(conexiune, cursor)
+        #####################################
 
 
         self.retranslateUi(MainWindow)
@@ -514,6 +526,9 @@ class Ui_MainWindow(object):
         cautare = self.textCautare.toPlainText()
         content = self.scrapeCautare(cautare)
         self.adaugareContent(content)
+        playlist_nou = Clasa_Playlist('IC', 'XC', 'NI', 'KA', '')
+        self.librarie.adaugaPlaylist(playlist_nou)
+        self.librarie.arataLibrarie()
     #####################################
     #clickDescarcaVideo
     def clickDescarcaVideo(self):
@@ -676,11 +691,7 @@ class Ui_MainWindow(object):
         self.labelActiunePlaylist.repaint()
     ####################################
 
-
-
-
 ############### Librarie, baza de date, adaugare playlist in librarie buton descarcare playlist
-
 
 
 
