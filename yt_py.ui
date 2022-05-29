@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1146</width>
-    <height>465</height>
+    <width>1149</width>
+    <height>463</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -24,7 +24,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>1</number>
     </property>
     <widget class="QWidget" name="tabCautare">
      <attribute name="title">
@@ -154,22 +154,45 @@
       </widget>
      </widget>
     </widget>
-    <widget class="QWidget" name="tab_3">
+    <widget class="QWidget" name="tabLibrarie">
      <attribute name="title">
       <string>Librarie</string>
      </attribute>
+     <widget class="QScrollArea" name="scrollAreaTabelLibrarie">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>10</y>
+        <width>541</width>
+        <height>361</height>
+       </rect>
+      </property>
+      <property name="widgetResizable">
+       <bool>true</bool>
+      </property>
+      <widget class="QWidget" name="scrollAreaWidgetContents_3">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>0</y>
+         <width>535</width>
+         <height>355</height>
+        </rect>
+       </property>
+      </widget>
+     </widget>
     </widget>
-    <widget class="QWidget" name="tabDescarcaPlaylist">
+    <widget class="QWidget" name="tabPlaylist">
      <attribute name="title">
-      <string>Descarca Playlist</string>
+      <string>Playlist</string>
      </attribute>
      <widget class="QScrollArea" name="scrollAreaClipuriPlaylist">
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>50</y>
+        <y>90</y>
         <width>531</width>
-        <height>311</height>
+        <height>281</height>
        </rect>
       </property>
       <property name="widgetResizable">
@@ -181,7 +204,7 @@
          <x>0</x>
          <y>0</y>
          <width>525</width>
-         <height>305</height>
+         <height>275</height>
         </rect>
        </property>
       </widget>
@@ -189,9 +212,9 @@
      <widget class="QTextEdit" name="textLinkPlaylist">
       <property name="geometry">
        <rect>
-        <x>120</x>
+        <x>110</x>
         <y>0</y>
-        <width>351</width>
+        <width>421</width>
         <height>41</height>
        </rect>
       </property>
@@ -229,9 +252,9 @@
      <widget class="QPushButton" name="pushButtonLinkPlaylist">
       <property name="geometry">
        <rect>
-        <x>480</x>
-        <y>0</y>
-        <width>51</width>
+        <x>0</x>
+        <y>50</y>
+        <width>91</width>
         <height>41</height>
        </rect>
       </property>
@@ -243,7 +266,7 @@
        </font>
       </property>
       <property name="text">
-       <string>OK</string>
+       <string>Vizualizare</string>
       </property>
      </widget>
      <widget class="QLabel" name="labelLinkPlaylist">
@@ -264,6 +287,46 @@
       </property>
       <property name="text">
        <string>Link playlist:</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButtonDescarcaPlaylist">
+      <property name="geometry">
+       <rect>
+        <x>100</x>
+        <y>50</y>
+        <width>91</width>
+        <height>41</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>Descarca</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButtonAdaugaInLibrarie">
+      <property name="geometry">
+       <rect>
+        <x>200</x>
+        <y>50</y>
+        <width>131</width>
+        <height>41</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>Adauga in librarie</string>
       </property>
      </widget>
     </widget>

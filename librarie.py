@@ -19,6 +19,16 @@ class Librarie:
         ##################################################
         #Functii CRUD
         ##################################################
+        #Select
+        def incarcaLibrarie(self):
+                with self.conexiune:
+                        try:
+                                self.cursor.execute("SELECT * FROM playlist")
+                                librarie = self.cursor.fetchall()
+                                return librarie
+                        except Exception as e:
+                                print(e)
+        ##################################################
         #Insert 
         def adaugaPlaylist(self, playlist):
                 with self.conexiune:
@@ -27,6 +37,7 @@ class Librarie:
                                         {'nume_playlist':playlist.nume_playlist, 'url_playlist':playlist.url_playlist, 'numar_clipuri':playlist.numar_clipuri, 'data_adaugare': playlist.data_adaugare, 'data_ultima_descarcare':playlist.data_ultima_descarcare})
                         except Exception as e:
                                 print(e)
+                                return "exista"
         ##################################################
         #Update
         def updateNumePlaylist(self, playlist, nume):
@@ -46,9 +57,4 @@ class Librarie:
                         self.cursor.execute("""DELETE FROM playlist  
                                                  WHERE url_playlist = :url_playlist""",
                                                  {'url_playlist':playlist.url_playlist})
-        ##################################################
-        #Select
-        def arataLibrarie(self):
-                self.cursor.execute("SELECT * FROM playlist")
-                print(self.cursor.fetchall())
         ##################################################
