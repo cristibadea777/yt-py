@@ -60,6 +60,8 @@ from datetime import datetime
 from playlist import Playlist as Clasa_Playlist
 from librarie import Librarie as ClasaLibrarie
 from datetime import datetime
+import clipboard
+
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -601,6 +603,10 @@ class Ui_MainWindow(object):
         self.labelActiuneTaie.repaint()
         self.playerTaie.play(link)
     #####################################
+    def clickCopiazaLink(self, url):
+        clipboard.copy(url)
+        #self.labelActiuneLibrarie.setText("Link copiat in clipboard")
+    #####################################
     #clickTaieVideo
     def clickTaieVideo(self):
         try:
@@ -662,9 +668,6 @@ class Ui_MainWindow(object):
     def clickOkPlaylist(self):
         link_playlist = self.textLinkPlaylist.toPlainText()
         playlist = Playlist(link_playlist)
-        playlist._video_regex = re.compile(r"\"url\":\"(/watch\?v=[\w-]*)")
-        self.numar_clipuri_playlist = len(playlist.video_urls)
-        print('Numar de clipuri in playlist: %s' %self.numar_clipuri_playlist)
         self.adaugareContentPlaylist(playlist)
     #####################################
     def clickAdaugaInLibrarie(self):
@@ -689,12 +692,19 @@ class Ui_MainWindow(object):
                 self.labelActiunePlaylist.setText("Eroare - Playlist privat sau Link invalid.")
                 self.labelActiunePlaylist.repaint()
 
-        
+    #####################################
+    def clickRedarePlaylistDinLibrarie(self, url):
+        self.taburi.setCurrentIndex(2) #miscare pe tab playlist
+        self.textLinkPlaylist.setText(url)
+        playlist = Playlist(url)
+        self.adaugareContentPlaylist(playlist)
 
-        
     #####################################
     #adaugareContentPlaylist
     def adaugareContentPlaylist(self, playlist):
+        #pentru nr clipuri playlist ramase
+        playlist._video_regex = re.compile(r"\"url\":\"(/watch\?v=[\w-]*)")
+        self.numar_clipuri_playlist = len(playlist.video_urls)
         self.labelActiunePlaylist.setText("Actiune: Adaugare clipuri..."+str(self.numar_clipuri_playlist))
         self.labelActiunePlaylist.repaint()
         top_widget = QtWidgets.QWidget()
@@ -770,12 +780,8 @@ class Ui_MainWindow(object):
                 #playlist[2] - numar_clipuri
                 #playlist[3] - data_adaugare
                 #playlist[4] - data_ultima_descarcare            
-                
-
-
 
                 ###########3De pus restu elementelor labeluri si butoane(ex sterge playlist, copiaza link)
-
 
                 #Asezat elemente
                 #group box, adaugat la vertical layout
@@ -791,13 +797,21 @@ class Ui_MainWindow(object):
                 font = QtGui.QFont()
                 font.setPointSize(11)
                 push_button.setFont(font)
+                push_button_linkplaylist = QtWidgets.QPushButton()
+                push_button_linkplaylist.setFixedSize(100, 50)
+                push_button_linkplaylist.setText("Copiaza link")
+                push_button_linkplaylist.setFont(font)
+                
                 #horizontal layout al group box
                 groupbox_horizontal_layout = QtWidgets.QHBoxLayout()
                 groupbox_horizontal_layout.addWidget(label_image)
                 groupbox_horizontal_layout.addWidget(push_button)
+                groupbox_horizontal_layout.addWidget(push_button_linkplaylist)
+
                 #Elementele nu vor avea spatii mari intre ele cu urmatoarele doua linii
                 groupbox_horizontal_layout.setSpacing(10) 
                 groupbox_horizontal_layout.addStretch(1) 
+                
                 #vertical layout
                 group_box.setLayout(groupbox_horizontal_layout)
                 top_vertical_layout.addLayout(groupbox_horizontal_layout) 
@@ -805,7 +819,8 @@ class Ui_MainWindow(object):
                 #Data pentru elemente
                 titlu = playlist[0]
                 group_box.setTitle(titlu)
-                #push_button.clicked.connect(lambda checked, index=playlist[1]: self.clickPlayVideoPlaylist(index)) #####De facut functie redare playlist
+                push_button.clicked.connect(lambda checked, index=playlist[1]: self.clickRedarePlaylistDinLibrarie(index))
+                push_button_linkplaylist.clicked.connect(lambda checked, index=playlist[1]: self.clickCopiazaLink(index)) 
                 #URL-ul thumbnail-ului primului video din thumbnail
                 try:
                         p = Playlist(playlist[1])
