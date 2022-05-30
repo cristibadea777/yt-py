@@ -52,9 +52,9 @@ class Librarie:
                                                  {'data_ultima_descarcare':data_ultima_descarcare, 'url_playlist':playlist.url_playlist})
         ##################################################
         #Delete
-        def deletePlaylist(self, playlist):
+        def deletePlaylist(self, url):
                 with self.conexiune:
                         self.cursor.execute("""DELETE FROM playlist  
                                                  WHERE url_playlist = :url_playlist""",
-                                                 {'url_playlist':playlist.url_playlist})
+                                                 {'url_playlist':url})
         ##################################################
