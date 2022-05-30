@@ -607,6 +607,17 @@ class Ui_MainWindow(object):
         clipboard.copy(url)
         #self.labelActiuneLibrarie.setText("Link copiat in clipboard")
     #####################################
+    def clickStergePlaylistLibrarie(self, url):
+        msg_box = QMessageBox()    
+        msg_box.setIcon(QMessageBox.Question)
+        msg_box.setWindowTitle("Sterge playlist")
+        msg_box.setText("Esti sigur ca vrei sa stergi playlistul?")
+        msg_box.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+        retval = msg_box.exec_()
+        if retval == QMessageBox.Yes:
+                self.librarie.deletePlaylist(url)
+                self.adaugareContentLibrarie()
+    #####################################
     #clickTaieVideo
     def clickTaieVideo(self):
         try:
@@ -760,14 +771,9 @@ class Ui_MainWindow(object):
         self.labelActiunePlaylist.setText("Actiune:")
         self.labelActiunePlaylist.repaint()
     ####################################
-    ##################################### Librarie, baza de date, adaugare playlist in librarie buton descarcare playlist
+    ####################################
     #Incarcare Librarie
     def adaugareContentLibrarie(self):
-        ########################
-        self.librarie.adaugaPlaylist(Clasa_Playlist('Muzica', 'https://www.youtube.com/playlist?list=PL4M5iuroDNv7ip82uRpHFjSgAjm0iR53l', '345', 'azi', 'azi'))
-        self.librarie.adaugaPlaylist(Clasa_Playlist('Istorie', 'https://www.youtube.com/playlist?list=PL4M5iuroDNv5SKL9mP7VpcqVaEfEdvJl1', '100', 'azi', 'azi'))
-        ########################
-
         #Din BD incarcam in variabila librarie informatiile din tabelul Playlist
         librarie = self.librarie.incarcaLibrarie()
         top_widget = QtWidgets.QWidget()
@@ -801,12 +807,17 @@ class Ui_MainWindow(object):
                 push_button_linkplaylist.setFixedSize(100, 50)
                 push_button_linkplaylist.setText("Copiaza link")
                 push_button_linkplaylist.setFont(font)
-                
+                push_button_sterge = QtWidgets.QPushButton()
+                push_button_sterge.setFixedSize(100, 50)
+                push_button_sterge.setText("Sterge")
+                push_button_sterge.setFont(font)
+
                 #horizontal layout al group box
                 groupbox_horizontal_layout = QtWidgets.QHBoxLayout()
                 groupbox_horizontal_layout.addWidget(label_image)
                 groupbox_horizontal_layout.addWidget(push_button)
                 groupbox_horizontal_layout.addWidget(push_button_linkplaylist)
+                groupbox_horizontal_layout.addWidget(push_button_sterge)
 
                 #Elementele nu vor avea spatii mari intre ele cu urmatoarele doua linii
                 groupbox_horizontal_layout.setSpacing(10) 
@@ -821,6 +832,7 @@ class Ui_MainWindow(object):
                 group_box.setTitle(titlu)
                 push_button.clicked.connect(lambda checked, index=playlist[1]: self.clickRedarePlaylistDinLibrarie(index))
                 push_button_linkplaylist.clicked.connect(lambda checked, index=playlist[1]: self.clickCopiazaLink(index)) 
+                push_button_sterge.clicked.connect(lambda checked, index=playlist[1]: self.clickStergePlaylistLibrarie(index)) 
                 #URL-ul thumbnail-ului primului video din thumbnail
                 try:
                         p = Playlist(playlist[1])
