@@ -9,12 +9,21 @@ class Librarie:
         def __init__(self, conexiune, cursor):
                 self.conexiune = conexiune
                 self.cursor = cursor
+                #Creare Tabel Playlist daca nu exista
                 cursor.execute("""CREATE TABLE IF NOT EXISTS playlist (
                         nume_playlist TEXT,
                         url_playlist TEXT NOT NULL PRIMARY KEY,
                         numar_clipuri INTEGER,
                         data_adaugare TEXT,
                         data_ultima_descarcare TEXT
+                        )""")
+                #Creare Tabel Videoclip daca nu exista 
+                cursor.execute("""CREATE TABLE IF NOT EXISTS videoclip (
+                        nume_playlist TEXT,
+                        url_playlist TEXT NOT NULL PRIMARY KEY,
+                        nume_videoclip TEXT,
+                        autor_videoclip TEXT,
+                        stare_descarcare TEXT
                         )""")
         ##################################################
         #Functii CRUD
