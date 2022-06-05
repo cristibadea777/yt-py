@@ -35,6 +35,17 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 #si daca data ultima descarcare (care depinde de noi) e mai veche decat Playlist.last_updated atunci sa apara ca trebuie descarcat (alt tab sau ceva)
 #la fel sa se faca si cu thumbnailu, daca s-a modificat playlistu sa se faca update si la thumbnail (de pus thumbnail_url in Clasa_Playlist, sa fie luat atunci cand il inseram) 
 
+#in librarie/playlist functie cautare video
+
+#in librarie radiobuton rosu/verde daca playlistu are videouri noi (si pop-up message pe radiobuton -"clipuri noi" cand pui mouseul)
+
+#pentru NUMAR CLIPURI atunci cand se incarca libraria, sa se ia playlisturile si sa se verifice nr clipuri, daca nr != nr_clipuri_playlist atunci nr_clipuri_paylist e updatat in BD cu nr
+
+#DE FACUT URMATORII PASI:
+#buton "Descarca" in librarie, functionalitate descarcare playlist, si librarie facuta mai mare sa incarce si butonu
+#splashscreen
+#https://doc.qt.io/qtforpython-5/PySide2/QtWidgets/QSplashScreen.html
+
 import mpv
 import requests
 from bs4 import BeautifulSoup
@@ -618,6 +629,21 @@ class Ui_MainWindow(object):
                 self.librarie.deletePlaylist(url)
                 self.adaugareContentLibrarie()
     #####################################
+    def clickDescarcaPlaylist(self, url):
+        #https://www.youtube.com/playlist?list=PL4M5iuroDNv7W2RgTANiUK08L95OiA0vy
+        #luare de clipuri din playlist cu scrape daca s-au modificat nr de clipuri (numar_clipuri < numar_clipuri_noi)
+        playlist = Playlist("https://www.youtube.com/playlist?list=PL4M5iuroDNv7W2RgTANiUK08L95OiA0vy")
+        playlist._video_regex = re.compile(r"\"url\":\"(/watch\?v=[\w-]*)")
+        nr_clipuri_noi = len(playlist.video_urls)
+        print('Number of videos in playlist: %s' % nr_clipuri_noi)
+        #se pun intr-un array URL-urile clipurilor
+        #se ia fiecare si se verifica in baza de date daca a fost descarcat (daca exista)
+        #se descarca, si se pune in baza de date 
+        #(campul "stare_descarcat" e cam degeaba, e mai mult vizual, pentru ca daca nu il gaseste atunci nu a fost descarcat)
+        #numar_clipuri devine numar_clipuri_noi
+
+
+    #####################################
     #clickTaieVideo
     def clickTaieVideo(self):
         try:
@@ -803,21 +829,28 @@ class Ui_MainWindow(object):
                 font = QtGui.QFont()
                 font.setPointSize(11)
                 push_button.setFont(font)
+                #buton copiere link playlist
                 push_button_linkplaylist = QtWidgets.QPushButton()
                 push_button_linkplaylist.setFixedSize(100, 50)
                 push_button_linkplaylist.setText("Copiaza link")
                 push_button_linkplaylist.setFont(font)
+                #buton sterge playlist din librarie
                 push_button_sterge = QtWidgets.QPushButton()
                 push_button_sterge.setFixedSize(100, 50)
                 push_button_sterge.setText("Sterge")
                 push_button_sterge.setFont(font)
-
+                #buton descarca playlist
+                push_button_descarca = QtWidgets.QPushButton()
+                push_button_descarca.setFixedSize(100, 50)
+                push_button_descarca.setText("Descarca")
+                push_button_descarca.setFont(font)
                 #horizontal layout al group box
                 groupbox_horizontal_layout = QtWidgets.QHBoxLayout()
                 groupbox_horizontal_layout.addWidget(label_image)
                 groupbox_horizontal_layout.addWidget(push_button)
                 groupbox_horizontal_layout.addWidget(push_button_linkplaylist)
                 groupbox_horizontal_layout.addWidget(push_button_sterge)
+                groupbox_horizontal_layout.addWidget(push_button_descarca)
 
                 #Elementele nu vor avea spatii mari intre ele cu urmatoarele doua linii
                 groupbox_horizontal_layout.setSpacing(10) 
@@ -833,6 +866,7 @@ class Ui_MainWindow(object):
                 push_button.clicked.connect(lambda checked, index=playlist[1]: self.clickRedarePlaylistDinLibrarie(index))
                 push_button_linkplaylist.clicked.connect(lambda checked, index=playlist[1]: self.clickCopiazaLink(index)) 
                 push_button_sterge.clicked.connect(lambda checked, index=playlist[1]: self.clickStergePlaylistLibrarie(index)) 
+                push_button_descarca.clicked.connect(lambda checked, index=playlist[1]: self.clickDescarcaPlaylist(index)) 
                 #URL-ul thumbnail-ului primului video din thumbnail
                 try:
                         p = Playlist(playlist[1])
