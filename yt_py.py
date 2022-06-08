@@ -628,10 +628,24 @@ class Ui_MainWindow(object):
         if retval == QMessageBox.Yes:
                 self.librarie.deletePlaylist(url)
                 self.adaugareContentLibrarie()
-    #####################################
+#################################################################################################################################################
+#################################################################################################################################################
+
+#8 Iunie 2022 - Dumnezeu sa-l ierte pe Frank Atwood
+#### Mai intai sa sterg folderu si sa vad sa fac git pull, ca sa nu isi mai dea merge aiurea pe alt branch
+#Pentru PULL: 
+#Stergem proiectu local. 
+#git config --global init.defaultBranch main
+#git init 
+#(se initializeaza git, cu ramura numita "main")
+#git pull git@github.com:cristibadea777/yt-py.git main
+#(se face pull de la origine - proiectul remote, din ramura main)
+#ACUM AVEM PROIECTUL REMOTE IN CALCULATORUL LOCAL...SE FACE COMMIT...PUSH...PE RAMURA MAIN (cea creata)
+
     def clickDescarcaPlaylist(self, url):
         #https://www.youtube.com/playlist?list=PL4M5iuroDNv7W2RgTANiUK08L95OiA0vy
         #luare de clipuri din playlist cu scrape daca s-au modificat nr de clipuri (numar_clipuri < numar_clipuri_noi)
+        #se face scraping si pt fiecare clip se verifica/descarca etc
         playlist = Playlist("https://www.youtube.com/playlist?list=PL4M5iuroDNv7W2RgTANiUK08L95OiA0vy")
         playlist._video_regex = re.compile(r"\"url\":\"(/watch\?v=[\w-]*)")
         nr_clipuri_noi = len(playlist.video_urls)
@@ -641,10 +655,9 @@ class Ui_MainWindow(object):
         #se descarca, si se pune in baza de date 
         #(campul "stare_descarcat" e cam degeaba, e mai mult vizual, pentru ca daca nu il gaseste atunci nu a fost descarcat)
         #numar_clipuri devine numar_clipuri_noi
+#################################################################################################################################################
+#################################################################################################################################################
 
-        #8 Iunie 2022
-
-    #####################################
     #clickTaieVideo
     def clickTaieVideo(self):
         try:
