@@ -642,6 +642,7 @@ class Ui_MainWindow(object):
         #(campul "stare_descarcat" e cam degeaba, e mai mult vizual, pentru ca daca nu il gaseste atunci nu a fost descarcat)
         #numar_clipuri devine numar_clipuri_noi
 
+        #8 Iunie 2022
 
     #####################################
     #clickTaieVideo
