@@ -70,6 +70,8 @@ import sqlite3
 from datetime import datetime
 from playlist import Playlist as Clasa_Playlist
 from librarie import Librarie as ClasaLibrarie
+from videoclip import Videoclip as Clasa_Videoclip
+
 from datetime import datetime
 import clipboard
 
@@ -630,7 +632,10 @@ class Ui_MainWindow(object):
                 self.adaugareContentLibrarie()
 #################################################################################################################################################
 #################################################################################################################################################
-
+#################################################################################################################################################
+##################################################################################################################################################################################################################################################################################################
+##################################################################################################################################################################################################################################################################################################
+#################################################################################################################################################
 #8 Iunie 2022 - Dumnezeu sa-l ierte pe Frank Atwood
 #### Mai intai sa sterg folderu si sa vad sa fac git pull, ca sa nu isi mai dea merge aiurea pe alt branch
 #Pentru PULL: 
@@ -642,19 +647,53 @@ class Ui_MainWindow(object):
 #(se face pull de la origine - proiectul remote, din ramura main)
 #ACUM AVEM PROIECTUL REMOTE IN CALCULATORUL LOCAL...SE FACE COMMIT...PUSH...PE RAMURA MAIN (cea creata)
 
-    def clickDescarcaPlaylist(self, url):
-        #https://www.youtube.com/playlist?list=PL4M5iuroDNv7W2RgTANiUK08L95OiA0vy
-        #luare de clipuri din playlist cu scrape daca s-au modificat nr de clipuri (numar_clipuri < numar_clipuri_noi)
+    def clickDescarcaPlaylist(self, url_playlist):
         #se face scraping si pt fiecare clip se verifica/descarca etc
-        playlist = Playlist("https://www.youtube.com/playlist?list=PL4M5iuroDNv7W2RgTANiUK08L95OiA0vy")
-        playlist._video_regex = re.compile(r"\"url\":\"(/watch\?v=[\w-]*)")
-        nr_clipuri_noi = len(playlist.video_urls)
-        print('Number of videos in playlist: %s' % nr_clipuri_noi)
+        playlist = Playlist(url_playlist)
+        nume_playlist = playlist.title
+
+        #########De facut#########
+        #########
+        #self.labelActiuneLibrarie.setText("Actiune: Descarcare playlist... (si nr clipuri ramase)")
+        #si inca un label dedesubt care arata numele clipului curent si cat mai are de descarcat (in viitor)
+        #self.labelActiuneLibrarie.repaint()
+        #########
+        ##########################
+
+        for url_videoclip in playlist.video_urls:
+            #putem avea acelas videoclip in mai multe playlisturi, de aceea dau si url_playlist
+            if self.librarie.gasesteVideo(url_videoclip, url_playlist) is None:
+                #descarca link cu link
+                try:
+                    with YoutubeDL() as ydl:
+                        ydl.download(url_videoclip)
+                    print("Descarcat in " + os.getcwd())
+                    #punere in BD daca a fost descarcat cu succes
+                    yt = YouTube(url_videoclip)
+                    autor_videoclip = yt.author
+                    nume_videoclip = yt.title
+                    #nume_playlist, url_playlist, url_videoclip, nume_videoclip, autor_videoclip, stare_descarcare
+                    self.librarie.adaugaVideoclip(Clasa_Videoclip(nume_playlist, url_playlist, url_videoclip, nume_videoclip, autor_videoclip, 'Descarcat'))
+                except Exception as e:
+                    print("Eroare: ")
+                    print(e)
+
         #se pun intr-un array URL-urile clipurilor
         #se ia fiecare si se verifica in baza de date daca a fost descarcat (daca exista)
         #se descarca, si se pune in baza de date 
         #(campul "stare_descarcat" e cam degeaba, e mai mult vizual, pentru ca daca nu il gaseste atunci nu a fost descarcat)
         #numar_clipuri devine numar_clipuri_noi
+
+########
+#luare de clipuri din playlist cu scrape daca s-au modificat nr de clipuri (numar_clipuri < numar_clipuri_noi)
+########
+#sa elimin conditia asta cu nr de clipuri de la descarcare. daca nr clipuri s-au modificat (marit)
+#atunci sa fie pusa intr-o lista ca sa fie aratata utilizatorului
+########
+#################################################################################################################################################
+##################################################################################################################################################################################################################################################################################################
+##################################################################################################################################################################################################################################################################################################
+#################################################################################################################################################
 #################################################################################################################################################
 #################################################################################################################################################
 

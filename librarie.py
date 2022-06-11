@@ -1,5 +1,6 @@
 import sqlite3
 from playlist import Playlist as Clasa_Playlist
+from videoclip import Videoclip as Clasa_Video
 from datetime import datetime
 
 #Clasa serviciu pentru clasa model Playlist
@@ -20,7 +21,8 @@ class Librarie:
                 #Creare Tabel Videoclip daca nu exista 
                 cursor.execute("""CREATE TABLE IF NOT EXISTS videoclip (
                         nume_playlist TEXT,
-                        url_playlist TEXT NOT NULL PRIMARY KEY,
+                        url_playlist TEXT,
+                        url_videoclip TEXT NOT NULL PRIMARY KEY,
                         nume_videoclip TEXT,
                         autor_videoclip TEXT,
                         stare_descarcare TEXT
@@ -38,12 +40,35 @@ class Librarie:
                         except Exception as e:
                                 print(e)
         ##################################################
+        def gasesteVideo(self, url_videoclip, url_playlist):
+                with self.conexiune:
+                        try:
+                                #Selecteaza videoul ce are linkul...
+                                self.cursor.execute(""" SELECT * FROM videoclip
+                                                        WHERE url_videoclip = :url_videoclip 
+                                                        AND url_playlist = :url_playlist""",
+                                                        {'url_videoclip':playlist.url_videoclip, 'url_playlist':playlist.url_playlist})
+                                rezultat = self.cursor.fetchall()
+                                return rezultat
+                        except Exception as e:
+                                print(e)
+        ##################################################
         #Insert 
         def adaugaPlaylist(self, playlist):
                 with self.conexiune:
                         try:
                                 self.cursor.execute("INSERT INTO playlist VALUES (:nume_playlist, :url_playlist, :numar_clipuri, :data_adaugare, :data_ultima_descarcare)", 
                                         {'nume_playlist':playlist.nume_playlist, 'url_playlist':playlist.url_playlist, 'numar_clipuri':playlist.numar_clipuri, 'data_adaugare': playlist.data_adaugare, 'data_ultima_descarcare':playlist.data_ultima_descarcare})
+                        except Exception as e:
+                                print(e)
+                                return "exista"
+                                                        
+
+        def adaugaVideoclip(self, videoclip):
+                with self.conexiune:
+                        try:
+                                self.cursor.execute("INSERT INTO videoclip VALUES (:nume_playlist, :url_playlist, :url_videoclip, :nume_videoclip, :autor_videoclip, :stare_descarcare)", 
+                                        {'nume_playlist':videoclip.nume_playlist, 'url_playlist':videoclip.url_playlist, 'url_videoclip':videoclip.url_videoclip, 'nume_videoclip':videoclip.nume_videoclip, 'autor_videoclip': videoclip.autor_videoclip, 'stare_descarcare':videoclip.stare_descarcare})
                         except Exception as e:
                                 print(e)
                                 return "exista"
