@@ -36,7 +36,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 #la fel sa se faca si cu thumbnailu, daca s-a modificat playlistu sa se faca update si la thumbnail (de pus thumbnail_url in Clasa_Playlist, sa fie luat atunci cand il inseram) 
 
 #in librarie/playlist functie cautare video
-
+#in librarie buton "schimba folder descarcare" - sau facut ca la media human, playlistu sa se salveze in folder diferit automat
 #in librarie radiobuton rosu/verde daca playlistu are videouri noi (si pop-up message pe radiobuton -"clipuri noi" cand pui mouseul)
 
 #pentru NUMAR CLIPURI atunci cand se incarca libraria, sa se ia playlisturile si sa se verifice nr clipuri, daca nr != nr_clipuri_playlist atunci nr_clipuri_paylist e updatat in BD cu nr
@@ -651,15 +651,6 @@ class Ui_MainWindow(object):
         #se face scraping si pt fiecare clip se verifica/descarca etc
         playlist = Playlist(url_playlist)
         nume_playlist = playlist.title
-
-        #########De facut#########
-        #########
-        #self.labelActiuneLibrarie.setText("Actiune: Descarcare playlist... (si nr clipuri ramase)")
-        #si inca un label dedesubt care arata numele clipului curent si cat mai are de descarcat (in viitor)
-        #self.labelActiuneLibrarie.repaint()
-        #########
-        ##########################
-
         for url_videoclip in playlist.video_urls:
             #putem avea acelas videoclip in mai multe playlisturi, de aceea dau si url_playlist
             if self.librarie.gasesteVideo(url_videoclip, url_playlist) is None:
@@ -677,13 +668,6 @@ class Ui_MainWindow(object):
                 except Exception as e:
                     print("Eroare: ")
                     print(e)
-
-        #se pun intr-un array URL-urile clipurilor
-        #se ia fiecare si se verifica in baza de date daca a fost descarcat (daca exista)
-        #se descarca, si se pune in baza de date 
-        #(campul "stare_descarcat" e cam degeaba, e mai mult vizual, pentru ca daca nu il gaseste atunci nu a fost descarcat)
-        #numar_clipuri devine numar_clipuri_noi
-
 ########
 #luare de clipuri din playlist cu scrape daca s-au modificat nr de clipuri (numar_clipuri < numar_clipuri_noi)
 ########
@@ -691,8 +675,16 @@ class Ui_MainWindow(object):
 #atunci sa fie pusa intr-o lista ca sa fie aratata utilizatorului
 ########
 #################################################################################################################################################
-##################################################################################################################################################################################################################################################################################################
-##################################################################################################################################################################################################################################################################################################
+#################################################################################################################################################
+#################################################################################################################################################
+#######
+#De facut label in librarie ca sa pun 
+        #########De facut#########
+        #########
+        #self.labelActiuneLibrarie.setText("Actiune: Descarcare playlist... (si nr clipuri ramase)")
+        #si inca un label dedesubt care arata numele clipului curent si cat mai are de descarcat (in viitor)
+        #self.labelActiuneLibrarie.repaint()
+################################################################################################################################################
 #################################################################################################################################################
 #################################################################################################################################################
 #################################################################################################################################################

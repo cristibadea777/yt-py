@@ -47,7 +47,7 @@ class Librarie:
                                 self.cursor.execute(""" SELECT * FROM videoclip
                                                         WHERE url_videoclip = :url_videoclip 
                                                         AND url_playlist = :url_playlist""",
-                                                        {'url_videoclip':playlist.url_videoclip, 'url_playlist':playlist.url_playlist})
+                                                        {'url_videoclip':url_videoclip, 'url_playlist':url_playlist})
                                 rezultat = self.cursor.fetchall()
                                 return rezultat
                         except Exception as e:
