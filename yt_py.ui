@@ -24,7 +24,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>2</number>
+     <number>1</number>
     </property>
     <widget class="QWidget" name="tabCautare">
      <attribute name="title">
@@ -163,7 +163,7 @@
        <rect>
         <x>10</x>
         <y>10</y>
-        <width>541</width>
+        <width>851</width>
         <height>361</height>
        </rect>
       </property>
@@ -175,11 +175,50 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>535</width>
+         <width>845</width>
          <height>355</height>
         </rect>
        </property>
       </widget>
+     </widget>
+     <widget class="QLabel" name="labelClipuriRamase">
+      <property name="geometry">
+       <rect>
+        <x>870</x>
+        <y>10</y>
+        <width>231</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Clipuri ramase de descarcat: </string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="labelVideoCurent1">
+      <property name="geometry">
+       <rect>
+        <x>870</x>
+        <y>50</y>
+        <width>231</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Video curent:</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="labelVideoCurent2">
+      <property name="geometry">
+       <rect>
+        <x>870</x>
+        <y>80</y>
+        <width>231</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Video curent...</string>
+      </property>
      </widget>
     </widget>
     <widget class="QWidget" name="tabPlaylist">

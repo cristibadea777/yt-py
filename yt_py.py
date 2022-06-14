@@ -39,6 +39,8 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 #in librarie buton "schimba folder descarcare" - sau facut ca la media human, playlistu sa se salveze in folder diferit automat
 #in librarie radiobuton rosu/verde daca playlistu are videouri noi (si pop-up message pe radiobuton -"clipuri noi" cand pui mouseul)
 
+#de marit label-urile ca sa se vada tot unde s-a descarcat calea
+
 #pentru NUMAR CLIPURI atunci cand se incarca libraria, sa se ia playlisturile si sa se verifice nr clipuri, daca nr != nr_clipuri_playlist atunci nr_clipuri_paylist e updatat in BD cu nr
 
 #DE FACUT URMATORII PASI:
@@ -79,8 +81,7 @@ import clipboard
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(1146, 465)
-        locale.setlocale(locale.LC_NUMERIC,"C")
+        MainWindow.resize(1149, 463)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.taburi = QtWidgets.QTabWidget(self.centralwidget)
@@ -138,13 +139,22 @@ class Ui_MainWindow(object):
         self.tabLibrarie = QtWidgets.QWidget()
         self.tabLibrarie.setObjectName("tabLibrarie")
         self.scrollAreaTabelLibrarie = QtWidgets.QScrollArea(self.tabLibrarie)
-        self.scrollAreaTabelLibrarie.setGeometry(QtCore.QRect(10, 10, 541, 361))
+        self.scrollAreaTabelLibrarie.setGeometry(QtCore.QRect(10, 10, 851, 361))
         self.scrollAreaTabelLibrarie.setWidgetResizable(True)
         self.scrollAreaTabelLibrarie.setObjectName("scrollAreaTabelLibrarie")
         self.scrollAreaWidgetContents_3 = QtWidgets.QWidget()
-        self.scrollAreaWidgetContents_3.setGeometry(QtCore.QRect(0, 0, 535, 355))
+        self.scrollAreaWidgetContents_3.setGeometry(QtCore.QRect(0, 0, 845, 355))
         self.scrollAreaWidgetContents_3.setObjectName("scrollAreaWidgetContents_3")
         self.scrollAreaTabelLibrarie.setWidget(self.scrollAreaWidgetContents_3)
+        self.labelClipuriRamase = QtWidgets.QLabel(self.tabLibrarie)
+        self.labelClipuriRamase.setGeometry(QtCore.QRect(870, 10, 231, 21))
+        self.labelClipuriRamase.setObjectName("labelClipuriRamase")
+        self.labelVideoCurent1 = QtWidgets.QLabel(self.tabLibrarie)
+        self.labelVideoCurent1.setGeometry(QtCore.QRect(870, 50, 231, 21))
+        self.labelVideoCurent1.setObjectName("labelVideoCurent1")
+        self.labelVideoCurent2 = QtWidgets.QLabel(self.tabLibrarie)
+        self.labelVideoCurent2.setGeometry(QtCore.QRect(870, 80, 231, 21))
+        self.labelVideoCurent2.setObjectName("labelVideoCurent2")
         self.taburi.addTab(self.tabLibrarie, "")
         self.tabPlaylist = QtWidgets.QWidget()
         self.tabPlaylist.setObjectName("tabPlaylist")
@@ -343,6 +353,54 @@ class Ui_MainWindow(object):
         self.statusbar.setObjectName("statusbar")
         MainWindow.setStatusBar(self.statusbar)
 
+        self.retranslateUi(MainWindow)
+        self.taburi.setCurrentIndex(1)
+        QtCore.QMetaObject.connectSlotsByName(MainWindow)
+
+    def retranslateUi(self, MainWindow):
+        _translate = QtCore.QCoreApplication.translate
+        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
+        self.pushButtonDescarca.setText(_translate("MainWindow", "Descarca"))
+        self.labelActiune.setText(_translate("MainWindow", "Actiune:..."))
+        self.pushButtonCautare.setText(_translate("MainWindow", "OK"))
+        self.labelCautare.setText(_translate("MainWindow", "Cautati clipuri pe YouTube:"))
+        self.taburi.setTabText(self.taburi.indexOf(self.tabCautare), _translate("MainWindow", "Cauta pe YouTube"))
+        self.labelClipuriRamase.setText(_translate("MainWindow", "Clipuri ramase de descarcat: "))
+        self.labelVideoCurent1.setText(_translate("MainWindow", "Video curent:"))
+        self.labelVideoCurent2.setText(_translate("MainWindow", "Video curent..."))
+        self.taburi.setTabText(self.taburi.indexOf(self.tabLibrarie), _translate("MainWindow", "Librarie"))
+        self.labelActiunePlaylist.setText(_translate("MainWindow", "Actiune:..."))
+        self.pushButtonLinkPlaylist.setText(_translate("MainWindow", "Vizualizare"))
+        self.labelLinkPlaylist.setText(_translate("MainWindow", "Link playlist:"))
+        self.pushButtonDescarcaPlaylist.setText(_translate("MainWindow", "Descarca"))
+        self.pushButtonAdaugaInLibrarie.setText(_translate("MainWindow", "Adauga in librarie"))
+        self.taburi.setTabText(self.taburi.indexOf(self.tabPlaylist), _translate("MainWindow", "Playlist"))
+        self.pushButtonOkTaie.setText(_translate("MainWindow", "OK"))
+        self.labelTaie.setText(_translate("MainWindow", "Taie clipul"))
+        self.textInceputOra.setPlaceholderText(_translate("MainWindow", "00"))
+        self.labelInceput.setText(_translate("MainWindow", "Timp inceput"))
+        self.labelSfarsit.setText(_translate("MainWindow", "Timp sfarsit"))
+        self.textInceputMinut.setPlaceholderText(_translate("MainWindow", "00"))
+        self.textInceputSecunda.setPlaceholderText(_translate("MainWindow", "00"))
+        self.textSfarsitOra.setPlaceholderText(_translate("MainWindow", "00"))
+        self.textSfarsitSecunda.setPlaceholderText(_translate("MainWindow", "00"))
+        self.textSfarsitMinut.setPlaceholderText(_translate("MainWindow", "00"))
+        self.labelH.setText(_translate("MainWindow", "H"))
+        self.labelM.setText(_translate("MainWindow", "M"))
+        self.labelS.setText(_translate("MainWindow", "S"))
+        self.pushButonTaieClip.setText(_translate("MainWindow", "Taie clipul"))
+        self.labelActiuneTaie.setText(_translate("MainWindow", "Actiune:..."))
+        self.taburi.setTabText(self.taburi.indexOf(self.tabTaieVideo), _translate("MainWindow", "Taie videoclip"))
+        self.taburi.setTabText(self.taburi.indexOf(self.tab_2), _translate("MainWindow", "Descarca videoclip"))
+        self.taburi.setTabText(self.taburi.indexOf(self.tab_6), _translate("MainWindow", "Setari"))
+        ######################
+        self.initializareElemente()
+        
+    def initializareElemente(self):
+        locale.setlocale(locale.LC_NUMERIC,"C")
+        self.labelClipuriRamase.setHidden(True)
+        self.labelVideoCurent1.setHidden(True) 
+        self.labelVideoCurent2.setHidden(True) 
         #####################################
         #Butoane
         #####################################    
@@ -352,6 +410,7 @@ class Ui_MainWindow(object):
         self.pushButonTaieClip.clicked.connect(self.clickTaieVideo)
         self.pushButtonLinkPlaylist.clicked.connect(self.clickOkPlaylist)
         self.pushButtonAdaugaInLibrarie.clicked.connect(self.clickAdaugaInLibrarie)
+        self.pushButtonDescarcaPlaylist.clicked.connect(self.clickDescarcaPlaylist)
         #####################################
         #Pentru MPV
         #https://github.com/jaseg/python-mpv
@@ -404,44 +463,6 @@ class Ui_MainWindow(object):
         self.librarie = ClasaLibrarie(conexiune, cursor)
         self.adaugareContentLibrarie()
         #####################################
-
-
-        self.retranslateUi(MainWindow)
-        QtCore.QMetaObject.connectSlotsByName(MainWindow)
-
-    def retranslateUi(self, MainWindow):
-        _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
-        self.pushButtonDescarca.setText(_translate("MainWindow", "Descarca"))
-        self.labelActiune.setText(_translate("MainWindow", "Actiune:..."))
-        self.pushButtonCautare.setText(_translate("MainWindow", "OK"))
-        self.labelCautare.setText(_translate("MainWindow", "Cautati clipuri pe YouTube:"))
-        self.taburi.setTabText(self.taburi.indexOf(self.tabCautare), _translate("MainWindow", "Cauta pe YouTube"))
-        self.taburi.setTabText(self.taburi.indexOf(self.tabLibrarie), _translate("MainWindow", "Librarie"))
-        self.labelActiunePlaylist.setText(_translate("MainWindow", "Actiune:..."))
-        self.pushButtonLinkPlaylist.setText(_translate("MainWindow", "Vizualizare"))
-        self.labelLinkPlaylist.setText(_translate("MainWindow", "Link playlist:"))
-        self.pushButtonDescarcaPlaylist.setText(_translate("MainWindow", "Descarca"))
-        self.pushButtonAdaugaInLibrarie.setText(_translate("MainWindow", "Adauga in librarie"))
-        self.taburi.setTabText(self.taburi.indexOf(self.tabPlaylist), _translate("MainWindow", "Playlist"))
-        self.pushButtonOkTaie.setText(_translate("MainWindow", "OK"))
-        self.labelTaie.setText(_translate("MainWindow", "Taie clipul"))
-        self.textInceputOra.setPlaceholderText(_translate("MainWindow", "00"))
-        self.labelInceput.setText(_translate("MainWindow", "Timp inceput"))
-        self.labelSfarsit.setText(_translate("MainWindow", "Timp sfarsit"))
-        self.textInceputMinut.setPlaceholderText(_translate("MainWindow", "00"))
-        self.textInceputSecunda.setPlaceholderText(_translate("MainWindow", "00"))
-        self.textSfarsitOra.setPlaceholderText(_translate("MainWindow", "00"))
-        self.textSfarsitSecunda.setPlaceholderText(_translate("MainWindow", "00"))
-        self.textSfarsitMinut.setPlaceholderText(_translate("MainWindow", "00"))
-        self.labelH.setText(_translate("MainWindow", "H"))
-        self.labelM.setText(_translate("MainWindow", "M"))
-        self.labelS.setText(_translate("MainWindow", "S"))
-        self.pushButonTaieClip.setText(_translate("MainWindow", "Taie clipul"))
-        self.labelActiuneTaie.setText(_translate("MainWindow", "Actiune:..."))
-        self.taburi.setTabText(self.taburi.indexOf(self.tabTaieVideo), _translate("MainWindow", "Taie videoclip"))
-        self.taburi.setTabText(self.taburi.indexOf(self.tab_2), _translate("MainWindow", "Descarca videoclip"))
-        self.taburi.setTabText(self.taburi.indexOf(self.tab_6), _translate("MainWindow", "Setari"))
 
     ####################################
     #scrape
@@ -504,10 +525,9 @@ class Ui_MainWindow(object):
             #fila temporara se distruge dupa ce iesim din clauza "with"
     #####################################
 
-
     #####################################
-    #adaugareContent
-    def adaugareContent(self, content):
+    #adaugare content cautare
+    def adaugareContentCautare(self, content):
         self.labelActiune.setText("Actiune: Adaugare clipuri...")
         self.labelActiune.repaint()
         top_widget = QtWidgets.QWidget()
@@ -556,7 +576,7 @@ class Ui_MainWindow(object):
                         ####################################
                         #indexul este URL-ul video-ului (v)
                         if k == "videoId" and len(v) == 11:
-                            push_button.clicked.connect(lambda checked, index=v: self.clickPlayVideo(index))
+                            push_button.clicked.connect(lambda checked, index=v: self.clickPlayVideoCautare(index))
                             #URL-ul thumbnail-ului, care e compus din ID-ul clipului
                             #Nu mai fac scrape la URL direct pentru ca thumbnailurile #shorts nu merg
                             #2.jpg, 1.jpg la shorts nu merg, dar 0.jpg merge. 
@@ -578,8 +598,8 @@ class Ui_MainWindow(object):
     def clickCautare(self):
         cautare = self.textCautare.toPlainText()
         content = self.scrapeCautare(cautare)
-        self.adaugareContent(content)
-    #####################################
+        self.adaugareContentCautare(content)
+    ##########################################################################
     #clickDescarcaVideo
     def clickDescarcaVideo(self):
         #https://github.com/yt-dlp/yt-dlp#embedding-yt-dlp
@@ -595,31 +615,31 @@ class Ui_MainWindow(object):
             print("Nu se poate descarca clipul. Eroare YT-DLP")
             self.labelActiune.setText("Nu se poate descarca videoclipul. Eroare yt-dlp")
             self.labelActiune.repaint()
-    ##################################### 
-    #clickPlayVideo
-    def clickPlayVideo(self, v):
+    ##########################################################################
+    #clickPlayVideoCautare
+    def clickPlayVideoCautare(self, v):
         self.labelActiune.setText("Actiune: Incarcare videoclip...")
         self.labelActiune.repaint()
         self.video_curent = "https://www.youtube.com/watch?v=" + v
         self.player.play(self.video_curent)
-    #####################################
+    ##########################################################################
     def clickPlayVideoPlaylist(self, v):
         self.labelActiunePlaylist.setText("Actiune: Incarcare videoclip...")
         self.labelActiunePlaylist.repaint()
         self.video_curent = "https://www.youtube.com/watch?v=" + v
         self.playerPlaylist.play(self.video_curent)
-    #####################################
+    ##########################################################################
     def clickPlayVideoTaie(self):
         link = self.textTaieClip.toPlainText()
         self.video_curent_taie = link
         self.labelActiuneTaie.setText("Actiune: Incarcare videoclip...")
         self.labelActiuneTaie.repaint()
         self.playerTaie.play(link)
-    #####################################
+    ##########################################################################
     def clickCopiazaLink(self, url):
         clipboard.copy(url)
         #self.labelActiuneLibrarie.setText("Link copiat in clipboard")
-    #####################################
+    ##########################################################################
     def clickStergePlaylistLibrarie(self, url):
         msg_box = QMessageBox()    
         msg_box.setIcon(QMessageBox.Question)
@@ -630,44 +650,78 @@ class Ui_MainWindow(object):
         if retval == QMessageBox.Yes:
                 self.librarie.deletePlaylist(url)
                 self.adaugareContentLibrarie()
-#################################################################################################################################################
-#################################################################################################################################################
-#################################################################################################################################################
-##################################################################################################################################################################################################################################################################################################
-##################################################################################################################################################################################################################################################################################################
-#################################################################################################################################################
-#8 Iunie 2022 - Dumnezeu sa-l ierte pe Frank Atwood
-#### Mai intai sa sterg folderu si sa vad sa fac git pull, ca sa nu isi mai dea merge aiurea pe alt branch
-#Pentru PULL: 
-#Stergem proiectu local. 
-#git config --global init.defaultBranch main
-#git init 
-#(se initializeaza git, cu ramura numita "main")
-#git pull git@github.com:cristibadea777/yt-py.git main
-#(se face pull de la origine - proiectul remote, din ramura main)
-#ACUM AVEM PROIECTUL REMOTE IN CALCULATORUL LOCAL...SE FACE COMMIT...PUSH...PE RAMURA MAIN (cea creata)
-
-    def clickDescarcaPlaylist(self, url_playlist):
-        #se face scraping si pt fiecare clip se verifica/descarca etc
-        playlist = Playlist(url_playlist)
-        nume_playlist = playlist.title
-        for url_videoclip in playlist.video_urls:
-            #putem avea acelas videoclip in mai multe playlisturi, de aceea dau si url_playlist
-            if self.librarie.gasesteVideo(url_videoclip, url_playlist) is None:
-                #descarca link cu link
-                try:
+    ##########################################################################
+    #Descarcare playlist
+    def clickDescarcaPlaylist(self):
+        url_playlist = self.textLinkPlaylist.toPlainText()
+        msg_box = QMessageBox()    
+        msg_box.setIcon(QMessageBox.Question)
+        msg_box.setText("Informatie Descarcare Playlist")
+        msg_box.setInformativeText("Playlisturile descarcate de aici si nu din sectiunea Librarie, nu vor fi salvate in Baza de Date, iar videoclipurile nu vor fi verificate daca au fost deja descarcate.")
+        msg_box.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
+        retval = msg_box.exec_()
+        if retval == QMessageBox.Ok:
+            try:
+                #se face scraping si pt fiecare clip se verifica/descarca etc
+                playlist = Playlist(url_playlist)
+                nume_playlist = playlist.title
+                self.numar_clipuri_playlist = len(playlist.video_urls)
+                for url_videoclip in playlist.video_urls:
+                    #descarca link cu link
+                    self.labelActiunePlaylist.setText("Descarcare clipuri, ramase " + str(self.numar_clipuri_playlist))
+                    self.labelActiunePlaylist.repaint()
                     with YoutubeDL() as ydl:
                         ydl.download(url_videoclip)
-                    print("Descarcat in " + os.getcwd())
-                    #punere in BD daca a fost descarcat cu succes
+                    self.numar_clipuri_playlist = self.numar_clipuri_playlist - 1
+                self.labelActiunePlaylist.setText("Descarcat in " + os.getcwd())
+                self.labelActiunePlaylist.repaint()
+                print("Descarcat in " + os.getcwd())
+            except Exception as e:
+                print(e)
+                self.labelActiunePlaylist.setText("Eroare - Playlist privat sau link invalid.")
+                self.labelActiunePlaylist.repaint()
+    #Descarcare playlist pentru Librarie
+    def clickDescarcaPlaylistLibrarie(self, url_playlist):
+        self.labelClipuriRamase.setHidden(False)
+        self.labelVideoCurent1.setHidden(False) 
+        self.labelVideoCurent2.setHidden(False) 
+        #se face scraping si pt fiecare clip se verifica/descarca etc
+        playlist = Playlist(url_playlist)
+        self.numar_clipuri_playlist = len(playlist.video_urls)
+        nume_playlist = playlist.title
+        print(url_playlist)
+        print(nume_playlist)
+        print(self.numar_clipuri_playlist)
+        for url_videoclip in playlist.video_urls:
+            #putem avea acelas videoclip in mai multe playlisturi, de aceea dau si url_playlist\
+            lista_rezultate = self.librarie.gasesteVideo(url_videoclip, url_playlist)
+            if len(lista_rezultate) == 0:
+                #descarca link cu link
+                try:
+                    print(url_videoclip)
+                    self.labelClipuriRamase.setText("Descarcare clipuri, ramase " + str(self.numar_clipuri_playlist))
+                    self.labelClipuriRamase.repaint()
                     yt = YouTube(url_videoclip)
                     autor_videoclip = yt.author
                     nume_videoclip = yt.title
+                    self.labelVideoCurent2.setText(autor_videoclip + " - " + nume_videoclip)
+                    self.labelVideoCurent2.repaint()
+                    with YoutubeDL() as ydl:
+                        ydl.download(url_videoclip)
+                    self.numar_clipuri_playlist = self.numar_clipuri_playlist - 1
+                    print("Descarcat in " + os.getcwd())
+                    #punere in BD daca a fost descarcat cu succes
                     #nume_playlist, url_playlist, url_videoclip, nume_videoclip, autor_videoclip, stare_descarcare
                     self.librarie.adaugaVideoclip(Clasa_Videoclip(nume_playlist, url_playlist, url_videoclip, nume_videoclip, autor_videoclip, 'Descarcat'))
                 except Exception as e:
                     print("Eroare: ")
                     print(e)
+        self.labelClipuriRamase.setText("Playlist descarcat in " + os.getcwd())
+        self.labelVideoCurent1.setHidden(True) 
+        self.labelVideoCurent2.setHidden(True) 
+
+
+
 ########
 #luare de clipuri din playlist cu scrape daca s-au modificat nr de clipuri (numar_clipuri < numar_clipuri_noi)
 ########
@@ -676,19 +730,9 @@ class Ui_MainWindow(object):
 ########
 #################################################################################################################################################
 #################################################################################################################################################
-#################################################################################################################################################
-#######
-#De facut label in librarie ca sa pun 
-        #########De facut#########
-        #########
-        #self.labelActiuneLibrarie.setText("Actiune: Descarcare playlist... (si nr clipuri ramase)")
-        #si inca un label dedesubt care arata numele clipului curent si cat mai are de descarcat (in viitor)
-        #self.labelActiuneLibrarie.repaint()
-################################################################################################################################################
-#################################################################################################################################################
-#################################################################################################################################################
-#################################################################################################################################################
 
+
+##########################################################################
     #clickTaieVideo
     def clickTaieVideo(self):
         try:
@@ -782,67 +826,92 @@ class Ui_MainWindow(object):
         self.adaugareContentPlaylist(playlist)
 
     #####################################
+    #########################################################################################################################################################################################
+    #########################################################################################################################################################################################
+    #########################################################################################################################################################################################
+    #########################################################################################################################################################################################
+    #########################################################################################################################################################################################
+    #########################################################################################################################################################################################
+    #########################################################################################################################################################################################
+    #De facut - sa se incarce progresiv nu toate odata
+    #########################################################################################################################################################################################
     #adaugareContentPlaylist
     def adaugareContentPlaylist(self, playlist):
-        #pentru nr clipuri playlist ramase
-        playlist._video_regex = re.compile(r"\"url\":\"(/watch\?v=[\w-]*)")
-        self.numar_clipuri_playlist = len(playlist.video_urls)
-        self.labelActiunePlaylist.setText("Actiune: Adaugare clipuri..."+str(self.numar_clipuri_playlist))
-        self.labelActiunePlaylist.repaint()
-        top_widget = QtWidgets.QWidget()
-        top_vertical_layout = QtWidgets.QVBoxLayout()
-        titlu = ""
-
-        #accesam lista playlist 
-        for url in playlist.video_urls:
-            #Asezat elemente
-            #group box, adaugat la vertical layout
-            group_box = QtWidgets.QGroupBox()
-            group_box.setCheckable(True)
-            group_box.setGeometry(QtCore.QRect(10, 20, 521, 141))
-            top_vertical_layout.addWidget(group_box)
-            #label imagine
-            label_image = QtWidgets.QLabel()
-            #buton play
-            push_button = QtWidgets.QPushButton()
-            push_button.setFixedSize(50, 50)
-            push_button.setText("▶︎")
-            font = QtGui.QFont()
-            font.setPointSize(20)
-            push_button.setFont(font)
-            #horizontal layout al group box
-            groupbox_horizontal_layout = QtWidgets.QHBoxLayout()
-            groupbox_horizontal_layout.addWidget(label_image)
-            groupbox_horizontal_layout.addWidget(push_button)
-            #Elementele nu vor avea spatii mari intre ele cu urmatoarele doua linii
-            groupbox_horizontal_layout.setSpacing(10) 
-            groupbox_horizontal_layout.addStretch(1) 
-            #vertical layout
-            group_box.setLayout(groupbox_horizontal_layout)
-            top_vertical_layout.addLayout(groupbox_horizontal_layout) 
-            
-            #Data pentru elemente
-            yt = YouTube(url) #pytube
-            titlu = yt.author + " - " + yt.title
-            group_box.setTitle(titlu)
-            push_button.clicked.connect(lambda checked, index=yt.video_id: self.clickPlayVideoPlaylist(index))
-            #URL-ul thumbnail-ului, care e compus din ID-ul clipului
-            #https://i.ytimg.com/vi/ "ID_VIDEO" /0.jpg  
-            #url = "https://i.ytimg.com/vi/" + yt.video_id + "/0.jpg"
-            #poate nu e nevoie de ^ si merge cu link-ul generat de pytube si pentru #shorts
-            smaller_pixmap = self.rezolvarePoza(yt.thumbnail_url)
-            label_image.setPixmap(smaller_pixmap)
-            self.numar_clipuri_playlist = self.numar_clipuri_playlist - 1
+        try:
+            #pentru nr clipuri playlist ramase
+            playlist._video_regex = re.compile(r"\"url\":\"(/watch\?v=[\w-]*)")
+            self.numar_clipuri_playlist = len(playlist.video_urls)
             self.labelActiunePlaylist.setText("Actiune: Adaugare clipuri..."+str(self.numar_clipuri_playlist))
             self.labelActiunePlaylist.repaint()
+            top_widget = QtWidgets.QWidget()
+            top_vertical_layout = QtWidgets.QVBoxLayout()
+            titlu = ""
+
+            #accesam lista playlist 
+            for url in playlist.video_urls:
+                #Asezat elemente
+                #group box, adaugat la vertical layout
+                group_box = QtWidgets.QGroupBox()
+                group_box.setCheckable(True)
+                group_box.setGeometry(QtCore.QRect(10, 20, 521, 141))
+                top_vertical_layout.addWidget(group_box)
+                #label imagine
+                label_image = QtWidgets.QLabel()
+                #buton play
+                push_button = QtWidgets.QPushButton()
+                push_button.setFixedSize(50, 50)
+                push_button.setText("▶︎")
+                font = QtGui.QFont()
+                font.setPointSize(20)
+                push_button.setFont(font)
+                #horizontal layout al group box
+                groupbox_horizontal_layout = QtWidgets.QHBoxLayout()
+                groupbox_horizontal_layout.addWidget(label_image)
+                groupbox_horizontal_layout.addWidget(push_button)
+                #Elementele nu vor avea spatii mari intre ele cu urmatoarele doua linii
+                groupbox_horizontal_layout.setSpacing(10) 
+                groupbox_horizontal_layout.addStretch(1) 
+                #vertical layout
+                group_box.setLayout(groupbox_horizontal_layout)
+                top_vertical_layout.addLayout(groupbox_horizontal_layout) 
+                
+                #Data pentru elemente
+                yt = YouTube(url) #pytube
+                titlu = yt.author + " - " + yt.title
+                group_box.setTitle(titlu)
+                push_button.clicked.connect(lambda checked, index=yt.video_id: self.clickPlayVideoPlaylist(index))
+                #URL-ul thumbnail-ului, care e compus din ID-ul clipului
+                #https://i.ytimg.com/vi/ "ID_VIDEO" /0.jpg  
+                #url = "https://i.ytimg.com/vi/" + yt.video_id + "/0.jpg"
+                #poate nu e nevoie de ^ si merge cu link-ul generat de pytube si pentru #shorts
+                smaller_pixmap = self.rezolvarePoza(yt.thumbnail_url)
+                label_image.setPixmap(smaller_pixmap)
+                self.numar_clipuri_playlist = self.numar_clipuri_playlist - 1
+                self.labelActiunePlaylist.setText("Actiune: Adaugare clipuri..."+str(self.numar_clipuri_playlist))
+                self.labelActiunePlaylist.repaint()
+                ####################################
             ####################################
-        ####################################
-        top_widget.setLayout(top_vertical_layout)
-        self.scrollAreaClipuriPlaylist.setWidget(top_widget) 
-        self.labelActiunePlaylist.setText("Actiune:")
-        self.labelActiunePlaylist.repaint()
+            top_widget.setLayout(top_vertical_layout)
+            self.scrollAreaClipuriPlaylist.setWidget(top_widget) 
+            self.labelActiunePlaylist.setText("Actiune:")
+            self.labelActiunePlaylist.repaint()
+        except Exception as e:
+            print(e)
+            self.labelActiunePlaylist.setText("Eroare. Link playlist invalid sau privat")
     ####################################
     ####################################
+
+    #########################################################################################################################################################################################
+    #########################################################################################################################################################################################
+    #########################################################################################################################################################################################
+    #########################################################################################################################################################################################
+    #########################################################################################################################################################################################
+    #########################################################################################################################################################################################
+    #########################################################################################################################################################################################
+    #########################################################################################################################################################################################
+    #########################################################################################################################################################################################
+
+
     #Incarcare Librarie
     def adaugareContentLibrarie(self):
         #Din BD incarcam in variabila librarie informatiile din tabelul Playlist
@@ -857,9 +926,6 @@ class Ui_MainWindow(object):
                 #playlist[2] - numar_clipuri
                 #playlist[3] - data_adaugare
                 #playlist[4] - data_ultima_descarcare            
-
-                ###########3De pus restu elementelor labeluri si butoane(ex sterge playlist, copiaza link)
-
                 #Asezat elemente
                 #group box, adaugat la vertical layout
                 group_box = QtWidgets.QGroupBox()
@@ -911,7 +977,7 @@ class Ui_MainWindow(object):
                 push_button.clicked.connect(lambda checked, index=playlist[1]: self.clickRedarePlaylistDinLibrarie(index))
                 push_button_linkplaylist.clicked.connect(lambda checked, index=playlist[1]: self.clickCopiazaLink(index)) 
                 push_button_sterge.clicked.connect(lambda checked, index=playlist[1]: self.clickStergePlaylistLibrarie(index)) 
-                push_button_descarca.clicked.connect(lambda checked, index=playlist[1]: self.clickDescarcaPlaylist(index)) 
+                push_button_descarca.clicked.connect(lambda checked, index=playlist[1]: self.clickDescarcaPlaylistLibrarie(index)) 
                 #URL-ul thumbnail-ului primului video din thumbnail
                 try:
                         p = Playlist(playlist[1])
