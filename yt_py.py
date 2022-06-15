@@ -70,12 +70,13 @@ from pytube import YouTube
 from pytube import Playlist
 import sqlite3
 from datetime import datetime
+import clipboard
+from QLed import QLed
 from playlist import Playlist as Clasa_Playlist
 from librarie import Librarie as ClasaLibrarie
 from videoclip import Videoclip as Clasa_Videoclip
 
-from datetime import datetime
-import clipboard
+
 
 
 class Ui_MainWindow(object):
@@ -398,9 +399,16 @@ class Ui_MainWindow(object):
         
     def initializareElemente(self):
         locale.setlocale(locale.LC_NUMERIC,"C")
+        font = QtGui.QFont()
+        font.setPointSize(8)
+        font.setBold(True)
+        font.setWeight(75)
         self.labelClipuriRamase.setHidden(True)
         self.labelVideoCurent1.setHidden(True) 
         self.labelVideoCurent2.setHidden(True) 
+        self.labelClipuriRamase.setFont(font)
+        self.labelVideoCurent1.setFont(font)
+        self.labelVideoCurent2.setFont(font)
         #####################################
         #Butoane
         #####################################    
@@ -720,18 +728,6 @@ class Ui_MainWindow(object):
         self.labelVideoCurent1.setHidden(True) 
         self.labelVideoCurent2.setHidden(True) 
 
-
-
-########
-#luare de clipuri din playlist cu scrape daca s-au modificat nr de clipuri (numar_clipuri < numar_clipuri_noi)
-########
-#sa elimin conditia asta cu nr de clipuri de la descarcare. daca nr clipuri s-au modificat (marit)
-#atunci sa fie pusa intr-o lista ca sa fie aratata utilizatorului
-########
-#################################################################################################################################################
-#################################################################################################################################################
-
-
 ##########################################################################
     #clickTaieVideo
     def clickTaieVideo(self):
@@ -955,6 +951,15 @@ class Ui_MainWindow(object):
                 push_button_descarca.setFixedSize(100, 50)
                 push_button_descarca.setText("Descarca")
                 push_button_descarca.setFont(font)
+                #label pentru atentionare utilizator pentru actualizare playlisturi 
+                font = QtGui.QFont()
+                font.setPointSize(12)
+                font.setBold(True)
+                font.setWeight(75)
+                label_actualizare_playlist = QLabel("- necesita actualizat")
+                label_actualizare_playlist.setFont(font)
+                label_actualizare_playlist.setStyleSheet('color: red')
+
                 #horizontal layout al group box
                 groupbox_horizontal_layout = QtWidgets.QHBoxLayout()
                 groupbox_horizontal_layout.addWidget(label_image)
@@ -978,14 +983,47 @@ class Ui_MainWindow(object):
                 push_button_linkplaylist.clicked.connect(lambda checked, index=playlist[1]: self.clickCopiazaLink(index)) 
                 push_button_sterge.clicked.connect(lambda checked, index=playlist[1]: self.clickStergePlaylistLibrarie(index)) 
                 push_button_descarca.clicked.connect(lambda checked, index=playlist[1]: self.clickDescarcaPlaylistLibrarie(index)) 
-                #URL-ul thumbnail-ului primului video din thumbnail
                 try:
                         p = Playlist(playlist[1])
                         y = YouTube(p.video_urls[0])
+                        ##################################################
+
+                        #URL-ul thumbnail-ului primului video din thumbnail
                         url_thumbnail_playlist = y.thumbnail_url 
                         #luam thumbnailul dintr-un obiect YouTube pe care il luam inainte dintr-un obiect Playlist(primul clip din playlist)
                         smaller_pixmap = self.rezolvarePoza(url_thumbnail_playlist)
                         label_image.setPixmap(smaller_pixmap)
+
+    #########################################################################################################################################################################################
+    #########################################################################################################################################################################################
+    #########################################################################################################################################################################################
+    #########################################################################################################################################################################################
+    #########################################################################################################################################################################################
+    #########################################################################################################################################################################################
+    #########################################################################################################################################################################################
+    #########################################################################################################################################################################################
+    #########################################################################################################################################################################################
+
+
+
+                        #La momentu actual NU e bun numaru stocat in BD. Ar trebui sa fie numar_clipuri_descarcate
+                        #Pentru ca asa, daca nu se modifica numaru de clipuri decand a fost pus playlistu in librarie
+                        #atunci ramane ca si cand nu ar trebui actualizat de parca a fost deja descarcat. 
+                        #Deci numar_clipuri_descarcate <  numar_clipuri_curente atunci --- label necesita descarcare
+
+
+                        ##################################################
+                        #Verificare actualizari playlisturi
+                        numar_clipuri_curente = len(p.video_urls)
+                        numar_clipuri_BD = self.librarie.numarClipuriPlaylist(playlist[1])[0] 
+                        #rezultatul este tuplu ex: (2,) de aia iau primu element care e int
+                        if numar_clipuri_curente > numar_clipuri_BD:
+                            groupbox_horizontal_layout.addWidget(label_actualizare_playlist)
+                        ##################################################
+
+
+
+
                 except Exception as e:
                         print(e)
                 ####################################

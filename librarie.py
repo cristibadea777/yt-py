@@ -53,6 +53,16 @@ class Librarie:
                         except Exception as e:
                                 print(e)
         ##################################################
+        def numarClipuriPlaylist(self, url_playlist):
+                try:
+                        #Selecteaza nr clipurilor playlistului din BD
+                        self.cursor.execute(""" SELECT numar_clipuri FROM playlist
+                                                WHERE url_playlist = :url_playlist  """, {'url_playlist':url_playlist})
+                        rezultat = self.cursor.fetchone()
+                        return rezultat
+                except Exception as e:
+                        print(e)
+        ##################################################
         #Insert 
         def adaugaPlaylist(self, playlist):
                 with self.conexiune:
