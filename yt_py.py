@@ -43,11 +43,31 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 
 #pentru NUMAR CLIPURI atunci cand se incarca libraria, sa se ia playlisturile si sa se verifice nr clipuri, daca nr != nr_clipuri_playlist atunci nr_clipuri_paylist e updatat in BD cu nr
 
+
+#pentru atunci cand se descarca un playlist...as putea sa pun un LABEL pt fiecare video din playlist. cu ID Label = ID videoclip. Si atunci cand se descarca,
+#sa se updateze fiecare label "se descarca..." si eventual si procentu
+
+#adaugare optiune de descarcare playlist DUPA un anumit video ex incepere descarcare dupa 300 de videouri
+
+        ##de vazut daca imi mai trebuie numarClipuriPlaylist, cred ca e degeaba, cred ca nici nu se actualizeaza nicaieri. de scos sau de facut sa faca update
+        #la fel si cu nr cliputi playlist, sa se actualizeze sau sa fie scos
+
 #DE FACUT URMATORII PASI:
 #buton "Descarca" in librarie, functionalitate descarcare playlist, si librarie facuta mai mare sa incarce si butonu
 #splashscreen
 #https://doc.qt.io/qtforpython-5/PySide2/QtWidgets/QSplashScreen.html
+#functie actualizare librarie dupa ce se descarca playlistu sa dispara labelu 
 
+#labelurile din librarie ar putea fi puse si sa aiba id-ul playlistului 'label_id_playlist'
+#ca sa pot lucra mai usor cu ele fara sa fac actualizarea librariei cand se incarca aplicatia ci doar cand se da click pe buton
+#deci cand pornim aplicatia labelurile sa nu fie (daca nu s-a facut actualizarea automata)
+#sa fie ascunse, dar sa existe cu 'label_id_playlist', si abia dupa ce se face actualizarea, sa apara cu textu daca necesita etc 
+#la setari utilizatoru aa poata bifa actualizarea automata la deschiderea aplicatiei
+
+#Buton "Verifica actualizarile"                        
+#Cand se apasa, se cheama aceeasi functie de incarcare librarie - dar in functie sa bag inca un argument 
+#Si daca e chemat argumentu atunci sa fie pusa si partea cu label_actualizare_playlist
+#iar numar_clipuri sa ramana, se baga la inserare, si se verifica doar cand se actioneaza butonu
 import mpv
 import requests
 from bs4 import BeautifulSoup
@@ -599,7 +619,7 @@ class Ui_MainWindow(object):
         self.labelActiune.setText("Actiune:")
         self.labelActiune.repaint()
     ####################################
-    
+            
     #butoane
     ################################################################
     ################################################################
@@ -627,7 +647,8 @@ class Ui_MainWindow(object):
     #clickPlayVideoCautare
     def clickPlayVideoCautare(self, v):
         self.labelActiune.setText("Actiune: Incarcare videoclip...")
-        self.labelActiune.repaint()
+        self.labelActiune.repaint() 
+
         self.video_curent = "https://www.youtube.com/watch?v=" + v
         self.player.play(self.video_curent)
     ##########################################################################
@@ -718,9 +739,11 @@ class Ui_MainWindow(object):
                         ydl.download(url_videoclip)
                     self.numar_clipuri_playlist = self.numar_clipuri_playlist - 1
                     print("Descarcat in " + os.getcwd())
-                    #punere in BD daca a fost descarcat cu succes
+                    #punere in BD - in tabelul Videoclip - daca a fost descarcat cu succes
                     #nume_playlist, url_playlist, url_videoclip, nume_videoclip, autor_videoclip, stare_descarcare
                     self.librarie.adaugaVideoclip(Clasa_Videoclip(nume_playlist, url_playlist, url_videoclip, nume_videoclip, autor_videoclip, 'Descarcat'))
+                    #incrementarea numarului de clipuri descarcate - in tabelul Playlist -
+                    self.librarie.updateIncrementareNumarClipuriDescarcate(url_playlist)
                 except Exception as e:
                     print("Eroare: ")
                     print(e)
@@ -800,7 +823,7 @@ class Ui_MainWindow(object):
         now = datetime.now()
         now.strftime("%d/%B/%Y, %H:%M:%S")
         try:
-                executie = self.librarie.adaugaPlaylist(Clasa_Playlist(playlist_adaugat.title, url, len(playlist_adaugat.video_urls), now.strftime("%d/%B/%Y, %H:%M"), 'Niciodata'))
+                executie = self.librarie.adaugaPlaylist(Clasa_Playlist(playlist_adaugat.title, url, len(playlist_adaugat.video_urls), now.strftime("%d/%B/%Y, %H:%M"), 'Niciodata', 0))
                 if executie == "exista":
                         self.labelActiunePlaylist.setText("Playlist deja existent in librarie")
                         self.labelActiunePlaylist.repaint()
@@ -852,7 +875,7 @@ class Ui_MainWindow(object):
                 group_box.setGeometry(QtCore.QRect(10, 20, 521, 141))
                 top_vertical_layout.addWidget(group_box)
                 #label imagine
-                label_image = QtWidgets.QLabel()
+                label_image = QtWidgets.QLabel() 
                 #buton play
                 push_button = QtWidgets.QPushButton()
                 push_button.setFixedSize(50, 50)
@@ -860,7 +883,7 @@ class Ui_MainWindow(object):
                 font = QtGui.QFont()
                 font.setPointSize(20)
                 push_button.setFont(font)
-                #horizontal layout al group box
+                #horizontal layout al group box 
                 groupbox_horizontal_layout = QtWidgets.QHBoxLayout()
                 groupbox_horizontal_layout.addWidget(label_image)
                 groupbox_horizontal_layout.addWidget(push_button)
@@ -994,36 +1017,13 @@ class Ui_MainWindow(object):
                         smaller_pixmap = self.rezolvarePoza(url_thumbnail_playlist)
                         label_image.setPixmap(smaller_pixmap)
 
-    #########################################################################################################################################################################################
-    #########################################################################################################################################################################################
-    #########################################################################################################################################################################################
-    #########################################################################################################################################################################################
-    #########################################################################################################################################################################################
-    #########################################################################################################################################################################################
-    #########################################################################################################################################################################################
-    #########################################################################################################################################################################################
-    #########################################################################################################################################################################################
-
-
-
-                        #La momentu actual NU e bun numaru stocat in BD. Ar trebui sa fie numar_clipuri_descarcate
-                        #Pentru ca asa, daca nu se modifica numaru de clipuri decand a fost pus playlistu in librarie
-                        #atunci ramane ca si cand nu ar trebui actualizat de parca a fost deja descarcat. 
-                        #Deci numar_clipuri_descarcate <  numar_clipuri_curente atunci --- label necesita descarcare
-
-
-                        ##################################################
                         #Verificare actualizari playlisturi
                         numar_clipuri_curente = len(p.video_urls)
-                        numar_clipuri_BD = self.librarie.numarClipuriPlaylist(playlist[1])[0] 
+                        numar_clipuri_descarcate = self.librarie.numarClipuriDescarcate(playlist[1])[0] 
                         #rezultatul este tuplu ex: (2,) de aia iau primu element care e int
-                        if numar_clipuri_curente > numar_clipuri_BD:
+                        if numar_clipuri_curente > numar_clipuri_descarcate:
                             groupbox_horizontal_layout.addWidget(label_actualizare_playlist)
                         ##################################################
-
-
-
-
                 except Exception as e:
                         print(e)
                 ####################################

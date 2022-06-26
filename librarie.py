@@ -16,7 +16,8 @@ class Librarie:
                         url_playlist TEXT NOT NULL PRIMARY KEY,
                         numar_clipuri INTEGER,
                         data_adaugare TEXT,
-                        data_ultima_descarcare TEXT
+                        data_ultima_descarcare TEXT,
+                        numar_clipuri_descarcate INTEGER
                         )""")
                 #Creare Tabel Videoclip daca nu exista 
                 cursor.execute("""CREATE TABLE IF NOT EXISTS videoclip (
@@ -53,6 +54,15 @@ class Librarie:
                         except Exception as e:
                                 print(e)
         ##################################################
+        def numarClipuriDescarcate(self, url_playlist):
+                try:
+                        #Selecteaza nr clipurilor descarcate playlistului din BD
+                        self.cursor.execute(""" SELECT numar_clipuri_descarcate FROM playlist
+                                                WHERE url_playlist = :url_playlist  """, {'url_playlist':url_playlist})
+                        rezultat = self.cursor.fetchone()
+                        return rezultat
+                except Exception as e:
+                        print(e)                     
         def numarClipuriPlaylist(self, url_playlist):
                 try:
                         #Selecteaza nr clipurilor playlistului din BD
@@ -67,8 +77,8 @@ class Librarie:
         def adaugaPlaylist(self, playlist):
                 with self.conexiune:
                         try:
-                                self.cursor.execute("INSERT INTO playlist VALUES (:nume_playlist, :url_playlist, :numar_clipuri, :data_adaugare, :data_ultima_descarcare)", 
-                                        {'nume_playlist':playlist.nume_playlist, 'url_playlist':playlist.url_playlist, 'numar_clipuri':playlist.numar_clipuri, 'data_adaugare': playlist.data_adaugare, 'data_ultima_descarcare':playlist.data_ultima_descarcare})
+                                self.cursor.execute("INSERT INTO playlist VALUES (:nume_playlist, :url_playlist, :numar_clipuri, :data_adaugare, :data_ultima_descarcare, :numar_clipuri_descarcate)", 
+                                        {'nume_playlist':playlist.nume_playlist, 'url_playlist':playlist.url_playlist, 'numar_clipuri':playlist.numar_clipuri, 'data_adaugare': playlist.data_adaugare, 'data_ultima_descarcare':playlist.data_ultima_descarcare, 'numar_clipuri_descarcate':playlist.numar_clipuri_descarcate})
                         except Exception as e:
                                 print(e)
                                 return "exista"
@@ -84,6 +94,14 @@ class Librarie:
                                 return "exista"
         ##################################################
         #Update
+        def updateIncrementareNumarClipuriDescarcate(self, url):
+                try:
+                        with self.conexiune:
+                                self.cursor.execute(""" UPDATE playlist SET numar_clipuri_descarcate = numar_clipuri_descarcate + 1 
+                                                        WHERE url_playlist = :url_playlist""",
+                                                        {'url_playlist':url})
+                except Exception as e:
+                        print(e)
         def updateNumePlaylist(self, playlist, nume):
                 with self.conexiune:
                         self.cursor.execute("""UPDATE playlist SET nume_playlist = :nume_playlist 
