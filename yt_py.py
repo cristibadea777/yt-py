@@ -68,6 +68,13 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 #Cand se apasa, se cheama aceeasi functie de incarcare librarie - dar in functie sa bag inca un argument 
 #Si daca e chemat argumentu atunci sa fie pusa si partea cu label_actualizare_playlist
 #iar numar_clipuri sa ramana, se baga la inserare, si se verifica doar cand se actioneaza butonu
+
+#in setari - optiune de descarcare fila mp3+mp4+thumbnail intr-un folder cu titlul ales (formatul de titlu ales in setari)
+
+#in loc sa apara linkul playlistului in text edit, sa fie doua butoane, unul de "lipeste link si vizualizare" altul de "copiaza link"
+
+#optiune de selectare calitate video atunci cand vizualizam
+
 import mpv
 import requests
 from bs4 import BeautifulSoup
@@ -93,9 +100,9 @@ from datetime import datetime
 import clipboard
 from QLed import QLed
 from playlist import Playlist as Clasa_Playlist
-from librarie import Librarie as ClasaLibrarie
+from librarie import Librarie as Clasa_Librarie
 from videoclip import Videoclip as Clasa_Videoclip
-
+from muncitori import ThreadPlaylist as Clasa_ThreadPlaylist
 
 
 
@@ -488,7 +495,7 @@ class Ui_MainWindow(object):
         conexiune = sqlite3.connect('librarie.db') #fisier pt baza de date. daca nu exista se creaza gol
         cursor = conexiune.cursor()#cursor - ne permite sa executam comenzi SQL pentru conexiune
         #Librarie
-        self.librarie = ClasaLibrarie(conexiune, cursor)
+        self.librarie = Clasa_Librarie(conexiune, cursor)
         self.adaugareContentLibrarie()
         #####################################
 
@@ -845,91 +852,70 @@ class Ui_MainWindow(object):
         self.adaugareContentPlaylist(playlist)
 
     #####################################
-    #########################################################################################################################################################################################
-    #########################################################################################################################################################################################
-    #########################################################################################################################################################################################
-    #########################################################################################################################################################################################
-    #########################################################################################################################################################################################
-    #########################################################################################################################################################################################
-    #########################################################################################################################################################################################
-    #De facut - sa se incarce progresiv nu toate odata
-    #########################################################################################################################################################################################
+
+    def update_scrollArea(self, url_videoclip):
+        #Asezat elemente
+        #group box, adaugat la vertical layout
+        group_box = QtWidgets.QGroupBox()
+        group_box.setCheckable(True)
+        group_box.setGeometry(QtCore.QRect(10, 20, 521, 141))
+        self.top_vertical_layout.addWidget(group_box)
+        #label imagine
+        label_image = QtWidgets.QLabel() 
+        #buton play
+        push_button = QtWidgets.QPushButton()
+        push_button.setFixedSize(50, 50)
+        push_button.setText("▶︎")
+        font = QtGui.QFont()
+        font.setPointSize(20)
+        push_button.setFont(font)
+        #horizontal layout al group box 
+        groupbox_horizontal_layout = QtWidgets.QHBoxLayout()
+        groupbox_horizontal_layout.addWidget(label_image)
+        groupbox_horizontal_layout.addWidget(push_button)
+        #Elementele nu vor avea spatii mari intre ele cu urmatoarele doua linii
+        groupbox_horizontal_layout.setSpacing(10) 
+        groupbox_horizontal_layout.addStretch(1) 
+        #vertical layout
+        group_box.setLayout(groupbox_horizontal_layout)
+        self.top_vertical_layout.addLayout(groupbox_horizontal_layout)
+        self.top_widget.setLayout(self.top_vertical_layout)
+        self.scrollAreaClipuriPlaylist.setWidget(self.top_widget)
+        self.numar_clipuri_playlist = self.numar_clipuri_playlist - 1
+        self.labelActiunePlaylist.setText("Actiune: Adaugare clipuri..."+str(self.numar_clipuri_playlist))
+        
+        #Data pentru elemente
+        yt = YouTube(url_videoclip) #pytube #url_videoclip transmis prin semnal de catre muncitor din bucla for
+        titlu = yt.author + " - " + yt.title
+        group_box.setTitle(titlu)
+        push_button.clicked.connect(lambda checked, index=yt.video_id: self.clickPlayVideoPlaylist(index))
+        #URL-ul thumbnail-ului, care e compus din ID-ul clipului
+        #https://i.ytimg.com/vi/ "ID_VIDEO" /0.jpg  
+        #url = "https://i.ytimg.com/vi/" + yt.video_id + "/0.jpg"
+        #poate nu e nevoie de ^ si merge cu link-ul generat de pytube si pentru #shorts
+        smaller_pixmap = self.rezolvarePoza(yt.thumbnail_url)
+        label_image.setPixmap(smaller_pixmap)
+        self.numar_clipuri_playlist = self.numar_clipuri_playlist - 1
+        self.labelActiunePlaylist.setText("Actiune: Adaugare clipuri..."+str(self.numar_clipuri_playlist))
+        self.labelActiunePlaylist.repaint()
+
     #adaugareContentPlaylist
     def adaugareContentPlaylist(self, playlist):
-        try:
-            #pentru nr clipuri playlist ramase
-            playlist._video_regex = re.compile(r"\"url\":\"(/watch\?v=[\w-]*)")
-            self.numar_clipuri_playlist = len(playlist.video_urls)
-            self.labelActiunePlaylist.setText("Actiune: Adaugare clipuri..."+str(self.numar_clipuri_playlist))
-            self.labelActiunePlaylist.repaint()
-            top_widget = QtWidgets.QWidget()
-            top_vertical_layout = QtWidgets.QVBoxLayout()
-            titlu = ""
+        self.top_widget = QtWidgets.QWidget()
+        self.top_vertical_layout = QtWidgets.QVBoxLayout()
+        # YouTube updated their HTML so the regex that Playlist uses to find the videos is currently outdated
+        playlist._video_regex = re.compile(r'\"url\":\"(/watch\?v=[\w-]*)')
+        self.numar_clipuri_playlist = len(playlist.video_urls)
+        self.labelActiunePlaylist.setText("Actiune: Adaugare clipuri..."+str(self.numar_clipuri_playlist))
+        self.labelActiunePlaylist.repaint()
+        #threading
+        self.thread_playlist = Clasa_ThreadPlaylist()
+        self.thread_playlist.setarePlaylist(playlist)
+        self.thread_playlist.start()
+        self.thread_playlist.semnal.connect(self.update_scrollArea)
 
-            #accesam lista playlist 
-            for url in playlist.video_urls:
-                #Asezat elemente
-                #group box, adaugat la vertical layout
-                group_box = QtWidgets.QGroupBox()
-                group_box.setCheckable(True)
-                group_box.setGeometry(QtCore.QRect(10, 20, 521, 141))
-                top_vertical_layout.addWidget(group_box)
-                #label imagine
-                label_image = QtWidgets.QLabel() 
-                #buton play
-                push_button = QtWidgets.QPushButton()
-                push_button.setFixedSize(50, 50)
-                push_button.setText("▶︎")
-                font = QtGui.QFont()
-                font.setPointSize(20)
-                push_button.setFont(font)
-                #horizontal layout al group box 
-                groupbox_horizontal_layout = QtWidgets.QHBoxLayout()
-                groupbox_horizontal_layout.addWidget(label_image)
-                groupbox_horizontal_layout.addWidget(push_button)
-                #Elementele nu vor avea spatii mari intre ele cu urmatoarele doua linii
-                groupbox_horizontal_layout.setSpacing(10) 
-                groupbox_horizontal_layout.addStretch(1) 
-                #vertical layout
-                group_box.setLayout(groupbox_horizontal_layout)
-                top_vertical_layout.addLayout(groupbox_horizontal_layout) 
-                
-                #Data pentru elemente
-                yt = YouTube(url) #pytube
-                titlu = yt.author + " - " + yt.title
-                group_box.setTitle(titlu)
-                push_button.clicked.connect(lambda checked, index=yt.video_id: self.clickPlayVideoPlaylist(index))
-                #URL-ul thumbnail-ului, care e compus din ID-ul clipului
-                #https://i.ytimg.com/vi/ "ID_VIDEO" /0.jpg  
-                #url = "https://i.ytimg.com/vi/" + yt.video_id + "/0.jpg"
-                #poate nu e nevoie de ^ si merge cu link-ul generat de pytube si pentru #shorts
-                smaller_pixmap = self.rezolvarePoza(yt.thumbnail_url)
-                label_image.setPixmap(smaller_pixmap)
-                self.numar_clipuri_playlist = self.numar_clipuri_playlist - 1
-                self.labelActiunePlaylist.setText("Actiune: Adaugare clipuri..."+str(self.numar_clipuri_playlist))
-                self.labelActiunePlaylist.repaint()
-                ####################################
-            ####################################
-            top_widget.setLayout(top_vertical_layout)
-            self.scrollAreaClipuriPlaylist.setWidget(top_widget) 
-            self.labelActiunePlaylist.setText("Actiune:")
-            self.labelActiunePlaylist.repaint()
-        except Exception as e:
-            print(e)
-            self.labelActiunePlaylist.setText("Eroare. Link playlist invalid sau privat")
     ####################################
     ####################################
-
-    #########################################################################################################################################################################################
-    #########################################################################################################################################################################################
-    #########################################################################################################################################################################################
-    #########################################################################################################################################################################################
-    #########################################################################################################################################################################################
-    #########################################################################################################################################################################################
-    #########################################################################################################################################################################################
-    #########################################################################################################################################################################################
-    #########################################################################################################################################################################################
-
 
     #Incarcare Librarie
     def adaugareContentLibrarie(self):
