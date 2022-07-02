@@ -881,8 +881,6 @@ class Ui_MainWindow(object):
         self.top_vertical_layout.addLayout(groupbox_horizontal_layout)
         self.top_widget.setLayout(self.top_vertical_layout)
         self.scrollAreaClipuriPlaylist.setWidget(self.top_widget)
-        self.numar_clipuri_playlist = self.numar_clipuri_playlist - 1
-        self.labelActiunePlaylist.setText("Actiune: Adaugare clipuri..."+str(self.numar_clipuri_playlist))
         
         #Data pentru elemente
         yt = YouTube(url_videoclip) #pytube #url_videoclip transmis prin semnal de catre muncitor din bucla for
@@ -897,7 +895,6 @@ class Ui_MainWindow(object):
         label_image.setPixmap(smaller_pixmap)
         self.numar_clipuri_playlist = self.numar_clipuri_playlist - 1
         self.labelActiunePlaylist.setText("Actiune: Adaugare clipuri..."+str(self.numar_clipuri_playlist))
-        self.labelActiunePlaylist.repaint()
 
     #adaugareContentPlaylist
     def adaugareContentPlaylist(self, playlist):
